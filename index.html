@@ -1,220 +1,460 @@
-<!DOCTYPE html>
-<html lang="es">
+<!DOCTYPE html>  
+<html lang="es">  
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Casas en Picos de Europa | Chalets en Bores · Valle de Liébana</title>
 
-<title>Cabañas Río Mundo | Casas Rurales en Riópar</title>
-<meta name="description" content="Cabañas rurales en Riópar, junto al Nacimiento del Río Mundo. Piscina en verano, entorno natural y contacto directo por WhatsApp.">
-<meta name="keywords" content="cabañas río mundo, casas rurales riópar, alojamiento rural albacete">
-<link rel="canonical" href="https://casaruralriomundo.es">
+<meta name="description" content="Chalets rurales en Bores, Valle de Liébana, a un paso de Potes y los Picos de Europa. Entorno natural único en Cantabria.">
+<meta name="keywords" content="chalets bores, valle liebana, picos de europa, potes, alojamiento rural cantabria">
+
+<link rel="canonical" href="https://casasenpicosdeeuropa.es">
 <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="images/favicon.svg">
 
-<!-- Estilos originales -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
 <link rel="stylesheet" href="css/global.css">
 <link rel="stylesheet" href="css/index.css">
 <link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/index-carousel.css"> 
-
-<!-- Flatpickr desde CDN -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <style>
-/* Estilos específicos para Flatpickr y no afectar tu web */
-.flatpickr-calendar {
-  font-family: inherit;
+
+body { font-family: 'DM Sans', sans-serif !important; }
+
+/* ===== NAVBAR ===== */
+.navbar {
+  background: #1a2f3d !important;
+  padding: 0 16px !important;
+  height: 64px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  box-shadow: none !important;
 }
-.flatpickr-day {
-  border-radius: 6px;
+
+.nav-logo {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  text-decoration: none !important;
+  font-size: unset !important;
+  color: unset !important;
+  text-shadow: none !important;
+}
+
+.nav-logo::before { content: none !important; }
+
+.nav-logo-icon {
+  width: 38px; height: 38px;
+  background: #2e5a6b;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 19px; flex-shrink: 0;
+}
+
+.nav-logo-text { display: flex; flex-direction: column; line-height: 1.15; }
+
+.nav-logo-text span:first-child {
+  font-size: 15px; font-weight: 600; color: #fff; letter-spacing: 0.01em;
+}
+
+.nav-logo-text span:last-child {
+  font-size: 11px; color: #7dd3c8; font-weight: 300;
+  letter-spacing: 0.07em; text-transform: uppercase;
+}
+
+.hamburger span { background: #fff !important; }
+.nav-menu { list-style: none !important; }
+.nav-menu li { list-style: none !important; }
+
+/* ===== NAV PILLS ===== */
+.nav-pills {
+  background: #fff;
+  border-bottom: 1px solid #e8e1d4;
+  display: flex; gap: 8px;
+  padding: 10px 16px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.nav-pills::-webkit-scrollbar { display: none; }
+
+.pill {
+  white-space: nowrap; padding: 7px 16px;
+  border-radius: 20px; font-size: 12px; font-weight: 500;
+  border: 1.5px solid #e8e1d4; color: #6b7a7f;
+  background: #fff; cursor: pointer; flex-shrink: 0;
+  text-decoration: none; display: inline-block;
+}
+
+.pill.active, .pill:hover {
+  background: #2e5a6b; border-color: #2e5a6b; color: #fff;
+}
+
+/* ===== HERO ===== */
+.hero {
+  position: relative !important;
+  height: 70vh !important;
+  min-height: unset !important;
+  background-image: url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1400&q=85') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  display: block !important;
+  overflow: hidden !important;
+}
+
+.hero::before {
+  content: '' !important;
+  position: absolute !important; inset: 0 !important;
+  background: linear-gradient(to bottom,
+    rgba(10,20,30,.15) 0%,
+    rgba(10,20,30,.0) 15%,
+    rgba(10,20,30,.55) 55%,
+    rgba(10,20,30,.9) 100%
+  ) !important;
+  z-index: 1 !important;
+}
+
+.header-inner { display: none !important; }
+
+.hero-content {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-70%);
+  left: 0; right: 0;
+  z-index: 2;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(255,255,255,.15);
+  border: 1.5px solid rgba(255,255,255,.5);
+  border-radius: 24px; padding: 7px 16px;
+  font-size: 13px; font-weight: 600; color: #fff;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 14px; backdrop-filter: blur(6px);
+}
+
+.hero-badge::before {
+  content: ''; width: 7px; height: 7px;
+  background: #7dd3c8; border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .4; transform: scale(1.5); }
+}
+
+.hero-content h1 {
+  font-family: 'Fraunces', serif !important;
+  font-size: 42px !important; color: #fff !important;
+  line-height: 1.05 !important; margin-bottom: 14px !important;
+  text-shadow: 0 2px 20px rgba(0,0,0,.4) !important;
+}
+
+.hero-content h1 em {
+  font-style: italic; color: #7dd3c8;
+  display: block; font-size: 48px;
+}
+
+.hero-content .hero-sub {
+  font-size: 15px !important;
+  color: rgba(255,255,255,.88) !important;
+  font-weight: 300 !important; line-height: 1.6 !important;
+  text-shadow: 0 1px 8px rgba(0,0,0,.5) !important;
+  max-width: 340px !important;
+  margin: 0 auto !important;
+}
+
+/* ===== BIENVENIDA ===== */
+.bienvenida-nueva {
+  padding: 28px 20px 24px;
+  border-bottom: 1px solid #e8e1d4;
+  max-width: 1200px; margin: auto;
+}
+
+.section-label {
+  font-size: 10px; font-weight: 600; color: #2e5a6b;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+}
+
+.section-label::after { content: ''; flex: 1; height: 1px; background: #c8dde4; }
+
+.bienvenida-nueva h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 28px; color: #1a2f3d; line-height: 1.2; margin-bottom: 12px;
+}
+
+.bienvenida-nueva h2 em { font-style: italic; color: #2e5a6b; }
+
+.bienvenida-nueva > p {
+  font-size: 14px; color: #6b7a7f; line-height: 1.7;
+  font-weight: 300; margin-bottom: 20px;
+}
+
+.features-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+
+.feat-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: #d4eaf0; color: #1a2f3d;
+  border-radius: 10px; padding: 8px 13px;
+  font-size: 12.5px; font-weight: 500;
+}
+
+.rating-strip {
+  display: flex; align-items: center; gap: 10px;
+  background: #fff; border-radius: 12px; padding: 12px 14px;
+  box-shadow: 0 1px 8px rgba(26,47,61,.07);
+}
+
+.rating-avatars { display: flex; }
+
+.avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 2px solid #fff; background: #2e5a6b; color: #fff;
+  font-size: 11px; display: flex; align-items: center;
+  justify-content: center; margin-left: -8px; font-weight: 600;
+}
+
+.avatar:first-child { margin-left: 0; }
+.rating-text { flex: 1; }
+.rating-stars { color: #f5a623; font-size: 14px; letter-spacing: 2px; margin-bottom: 2px; }
+.rating-text p { font-size: 11.5px; color: #6b7a7f; margin: 0; line-height: 1.3; }
+.rating-text p strong { color: #1a2f3d; }
+
+/* ===== CHALET CARDS ===== */
+:root {
+  --blue-deep: #1a2f3d; --blue-mid: #2e5a6b;
+  --blue-light: #d4eaf0; --muted-blue: #6b7a7f;
+}
+
+.cabanas-nuevas { display: flex; flex-direction: column; gap: 20px; margin-top: 20px; }
+
+.cabin-card-nueva {
+  background: #fff; border-radius: 20px; overflow: hidden;
+  box-shadow: 0 2px 16px rgba(26,47,61,.10); transition: transform .2s;
+}
+
+.cabin-card-nueva:active { transform: scale(0.98); }
+.cabin-card-photo { height: 210px; position: relative; overflow: hidden; }
+
+.cabin-card-photo img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform .5s ease; display: block;
+}
+
+.cabin-card-nueva:hover .cabin-card-photo img { transform: scale(1.05); }
+
+.cabin-card-photo::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to bottom, transparent 45%, rgba(26,47,61,.65) 100%);
+}
+
+.cabin-tag {
+  position: absolute; top: 14px; left: 14px; z-index: 2;
+  background: rgba(255,255,255,.92); color: var(--blue-mid);
+  font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 5px 11px; border-radius: 20px;
+}
+
+.cabin-capacity {
+  position: absolute; bottom: 14px; left: 14px; z-index: 2;
+  color: #fff; font-size: 13px; display: flex; align-items: center; gap: 5px;
+}
+
+.cabin-body { padding: 18px 18px 20px; }
+
+.cabin-body h3 {
+  font-family: 'Fraunces', serif; font-size: 22px;
+  color: var(--blue-deep); margin: 0 0 6px;
+}
+
+.cabin-body p {
+  font-size: 13.5px; color: var(--muted-blue);
+  line-height: 1.65; margin: 0 0 16px;
+}
+
+.cabin-feats { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 18px; }
+
+.cabin-feat {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--blue-light); color: var(--blue-deep);
+  border-radius: 8px; padding: 6px 11px; font-size: 12px; font-weight: 500;
+}
+
+.cabin-cta {
+  display: block; text-align: center; background: var(--blue-mid);
+  color: #fff; text-decoration: none; border-radius: 12px; padding: 13px;
+  font-size: 14px; font-weight: 500; letter-spacing: 0.02em; transition: background .2s;
+}
+
+.cabin-cta:hover { background: var(--blue-deep); }
+
+@media (min-width: 768px) {
+  .cabanas-nuevas { flex-direction: row; }
+  .cabin-card-nueva { flex: 1; }
+  .cabin-card-photo { height: 280px; }
+}
+
+/* ===== TURISMO ===== */
+.turismo-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 20px; margin-top: 20px;
+}
+
+.turismo-card {
+  border-radius: 12px; overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  background: white; border: 2px solid #2e5a6b;
+  transition: transform 0.3s ease; text-decoration: none;
+  color: inherit; display: block;
+}
+
+.turismo-card:hover { transform: translateY(-5px); }
+.turismo-card img { width: 100%; height: 180px; object-fit: cover; display: block; }
+.turismo-card-body { padding: 12px 14px; }
+.turismo-card-body h3 { font-size: 0.95rem; color: #2e5a6b; margin: 0; line-height: 1.3; }
+.turismo-card-body span { font-size: 0.8rem; color: #888; margin-top: 4px; display: block; }
+
+@media (max-width: 768px) { .turismo-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .turismo-grid { grid-template-columns: 1fr; } }
+
+/* ===== BOTONES FLOTANTES ===== */
+#whatsappButton {
+  position: fixed; bottom: 20px; right: 20px;
+  width: 60px; height: 60px; z-index: 1000; border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3); background-color: #25D366;
+  display: flex; justify-content: center; align-items: center;
+}
+#whatsappButton img { width: 35px; height: 35px; }
+
+#adminButton {
+  position: fixed; bottom: 20px; left: 20px;
+  width: 50px; height: 50px; z-index: 1000; border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3); background-color: #444;
+  color: #fff; font-size: 24px; display: flex;
+  justify-content: center; align-items: center; cursor: pointer;
+}
+
+@media (max-width: 600px) { .flatpickr-calendar.inline { width: 100% !important; } }
+
+.flatpickr-day.bloqueado {
+  background: #e53935 !important; color: white !important; cursor: not-allowed !important;
 }
 </style>
 
 </head>
+  
 <body>
 
 <!-- ===== NAVBAR ===== -->
 <nav class="navbar">
   <div class="nav-container">
-    <a href="index.html" class="nav-logo">🏡 Cabañas Río Mundo</a>
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon">🏔️</div>
+      <div class="nav-logo-text">
+        <span>Casas en Picos de Europa</span>
+        <span>Valle de Liébana · Bores</span>
+      </div>
+    </a>
     <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
-    <ul class="nav-menu" id="navMenu">
-      <li><a href="cabana-campanilla.html" class="nav-link">Campanilla</a></li>
-      <li><a href="cabana-el-tejo.html" class="nav-link">El Tejo</a></li>
-      <li><a href="https://casaruralriomundo.wordpress.com/" class="nav-link" target="_blank" rel="noopener">Experiencias</a></li>
-      <li><a href="#contacto" class="nav-link">Contacto</a></li>
-    </ul>
   </div>
 </nav>
+
+<!-- ===== NAV PILLS ===== -->
+<div class="nav-pills">
+  <a class="pill active" href="#reserva-online">Reservar</a>
+  <a class="pill" href="#chalets">Ver Chalets</a>
+  <a class="pill" href="#contacto">Contacto</a>
+</div>
 
 <!-- ===== HERO ===== -->
 <header class="hero">
   <div class="header-inner">
-
-    <div class="hero-title-top">
-      Cabañas en Riopar
-    </div>
-
-    <div class="hero-title-bottom">
-      Complejo El Lagunazo
-    </div>
-
-    <p class="hero-sub">
-      Escapadas, naturaleza y tranquilidad junto al espectacular
-      Nacimiento del Río Mundo, dentro del Parque Natural
-    </p>
-
+    <div class="hero-title-top">Chalets en Bores</div>
+    <div class="hero-title-bottom">Valle de Liébana</div>
+    <p class="hero-sub">Naturaleza, montaña y tranquilidad en los Picos de Europa, a un paso de Potes</p>
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge">📍 Bores · Picos de Europa</div>
+    <h1>Chalets en<br><em>Bores</em></h1>
+    <p class="hero-sub">Naturaleza, montaña y tranquilidad en el Valle de Liébana, a un paso de Potes y los Picos de Europa</p>
   </div>
 </header>
 
-<!-- ===== SECCIONES INFORMATIVAS ===== -->
-<section>
-  <h2>Tu escapada rural en Riópar</h2>
-  <p>Bienvenido a Cabañas Río Mundo, disponemos de dos acogedoras cabañas rurales, con todas las comodidades, situadas en el
-     exclusivo complejo El Lagunazo de Riópar, con un lago privado, a muy pocos minutos del Nacimiento del Río Mundo.
-     Un entorno natural ideal para descansar, disfrutar en familia o realizar escapadas románticas durante todo el año.</p>
-</section>
-
-<section>
-  <h2>Nuestras exclusivas Cabañas</h2>
-  <div class="cabanias-grid">
-    <div class="cabin-card">
-      <h3>Cabaña Campanilla</h3>
-      <p>Capacidad para hasta 6 personas, dispone de 2 habitaciones y un altillo, perfecta para familias o grupos.</p>
-      <a class="boton" href="cabana-campanilla.html">Ver Cabaña Campanilla</a>
+<!-- ===== BIENVENIDA ===== -->
+<div class="bienvenida-nueva">
+  <div class="section-label">Bienvenidos</div>
+  <h2>Tu escapada en los<br><em>Picos de Europa</em></h2>
+  <p>Dos acogedores chalets rurales en Bores, en pleno Valle de Liébana, a pocos minutos de Potes. Un entorno de montaña espectacular, ideal para descansar, disfrutar en familia o vivir una aventura en la naturaleza.</p>
+  <div class="features-row">
+    <div class="feat-pill">🏔️ Picos de Europa</div>
+    <div class="feat-pill">🌿 Valle de Liébana</div>
+    <div class="feat-pill">🏘️ A un paso de Potes</div>
+    <div class="feat-pill">🦅 Fauna salvaje</div>
+  </div>
+  <div class="rating-strip">
+    <div class="rating-avatars">
+      <div class="avatar">M</div>
+      <div class="avatar">A</div>
+      <div class="avatar">R</div>
+      <div class="avatar">+</div>
     </div>
-    <div class="cabin-card">
-      <h3>Cabaña El Tejo</h3>
-      <p>Cabaña para hasta 4 personas, ideal para parejas o pequeñas familias que buscan tranquilidad y naturaleza.</p>
-      <a class="boton" href="cabana-el-tejo.html">Ver Cabaña El Tejo</a>
+    <div class="rating-text">
+      <div class="rating-stars">★★★★★</div>
+      <p><strong>+50 familias</strong> han disfrutado este año</p>
     </div>
   </div>
-</section>
+</div>
 
-<!-- ===== CARRUSEL GENERAL ===== -->
-<section class="carousel-general-section">
-  <h2>Galería General</h2>
-  <div class="carousel-container-general">
-    <div class="carousel-general-slides">
-      <div class="carousel-slide-general active">
-        <img src="images/1000150795.jpg" alt="Imagen general 1">
+<!-- ===== CHALET CARDS ===== -->
+<section id="chalets">
+  <h2>Nuestros exclusivos Chalets</h2>
+  <div class="cabanas-nuevas">
+
+    <div class="cabin-card-nueva">
+      <div class="cabin-card-photo">
+        <img src="images/rebeco.jpg" alt="Chalet El Rebeco">
+        <span class="cabin-tag">🦌 El Rebeco</span>
+        <div class="cabin-capacity">👨‍👩‍👧 Hasta 7 personas</div>
       </div>
-      <div class="carousel-slide-general">
-        <img src="images/1000150768.jpg" alt="Imagen general 2">
-      </div>
-      <div class="carousel-slide-general">
-        <img src="images/1000150757.jpg" alt="Imagen general 3">
-      </div>
-      <div class="carousel-slide-general">
-        <img src="images/1000150758.jpg" alt="Imagen general 4">
-      </div>
-      <div class="carousel-slide-general">
-        <img src="images/1000150760.jpg" alt="Imagen general 5">
-      </div>
-      <div class="carousel-slide-general">
-        <img src="images/1000150761.jpg" alt="Imagen general 6">
-      </div>
-      <div class="carousel-slide-general">
-        <img src="images/1000150779.jpg" alt="Imagen general 7">
-      </div>
-      <div class="carousel-slide-general">
-        <img src="images/1000150780.jpg" alt="Imagen general 8">
-      </div>
-      <div class="carousel-slide-general">
-        <img src="images/1000150783.jpg" alt="Imagen general 9">
-      </div>
-      <div class="carousel-slide-general">
-        <img src="images/1000150788.jpg" alt="Imagen general 10">
-      </div>
-      <div class="carousel-slide-general">
-        <img src="images/1000150779.jpg" alt="Imagen general 11">
-      </div>
-      <div class="carousel-slide-general">
-        <img src="images/1000150800.jpg" alt="Imagen general 12">
-      </div>
-      <div class="carousel-slide-general">
-        <img src="images/1000150776.jpg" alt="Imagen general 13">
-      </div>
-      <div class="carousel-slide-general">
-        <img src="images/1000150806.jpg" alt="Imagen general 14">
-      </div>
-      <div class="carousel-slide-general">
-        <img src="images/1000150807.jpg" alt="Imagen general 15">
-      </div>
-      <div class="carousel-slide-general">
-        <img src="images/1000150816.jpg" alt="Imagen general 16">
-      </div>
-      <div class="carousel-slide-general">
-        <img src="images/1000150795.jpg" alt="Imagen general 17">
-      </div>
-      <div class="carousel-slide-general">
-        <img src="images/1000173072.jpg" alt="Imagen general 18">
-      </div>
-      <div class="carousel-slide-general">
-        <img src="images/1000173073.jpg" alt="Imagen general 19">
-      </div>
-        <div class="carousel-slide-general">
-        <img src="images/1000173071.jpg" alt="Imagen general 20">
-      </div>
-          <div class="carousel-slide-general">
-        <img src="images/1000173065.jpg" alt="Imagen general 21">
-      </div>
-          <div class="carousel-slide-general">
-        <img src="images/1000173061.jpg" alt="Imagen general 22">
-      </div>
-          <div class="carousel-slide-general">
-        <img src="images/1000173057.jpg" alt="Imagen general 23">
+      <div class="cabin-body">
+        <h3>Chalet El Rebeco</h3>
+        <p>Chalet para hasta 7 personas con 2 habitaciones y sofá cama. Perfecto para familias o grupos en plena naturaleza.</p>
+        <div class="cabin-feats">
+          <span class="cabin-feat">🛏 2 habitaciones</span>
+          <span class="cabin-feat">🛋️ Sofá cama</span>
+          <span class="cabin-feat">👨‍👩‍👧 7 personas</span>
+          <span class="cabin-feat">🏔️ Picos de Europa</span>
+        </div>
+        <a class="cabin-cta" href="chalet-el-rebeco.html">Ver Chalet El Rebeco</a>
       </div>
     </div>
 
-    <button class="carousel-button-general prev-general">❮</button>
-    <button class="carousel-button-general next-general">❯</button>
-
-    <div class="carousel-indicators-general">
-      <div class="indicator-general active"></div>
-      <div class="indicator-general"></div>
-      <div class="indicator-general"></div>
-      <div class="indicator-general"></div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== CARRUSEL PISCINA ===== -->
-<section class="carousel-general-section">
-  <h2>Piscina en temporada de verano</h2>
-  <p>Durante los meses de verano, nuestros huéspedes pueden disfrutar de una piscina en plena naturaleza y totalmente rodeados de pinos, convirtiendo la estancia en una experiencia única y refrescante.</p>
-  
-  <div class="carousel-container-general">
-    <div class="carousel-general-slides">
-      <div class="carousel-slide-general active">
-        <img src="images/1000183084.jpg" alt="Piscina 1">
+    <div class="cabin-card-nueva">
+      <div class="cabin-card-photo">
+        <img src="images/urogallo.jpg" alt="Chalet El Urogallo">
+        <span class="cabin-tag">🦅 El Urogallo</span>
+        <div class="cabin-capacity">👨‍👩‍👧 Hasta 7 personas</div>
       </div>
-      <div class="carousel-slide-general">
-        <img src="images/1000183086.jpg" alt="Piscina 2">
-      </div>
-      <div class="carousel-slide-general">
-        <img src="images/1000183088.jpg" alt="Piscina 3">
-      </div>
-      <div class="carousel-slide-general">
-        <img src="images/1000183085.jpg" alt="Piscina 4">
-      </div>
-      <div class="carousel-slide-general">
-        <img src="images/1000183090.jpg" alt="Piscina 5">
-      </div>
-      <div class="carousel-slide-general">
-        <img src="images/1000183089.jpg" alt="Piscina 6">
+      <div class="cabin-body">
+        <h3>Chalet El Urogallo</h3>
+        <p>Chalet para hasta 7 personas con 2 habitaciones y sofá cama. Ideal para grupos que buscan montaña y tranquilidad.</p>
+        <div class="cabin-feats">
+          <span class="cabin-feat">🛏 2 habitaciones</span>
+          <span class="cabin-feat">🛋️ Sofá cama</span>
+          <span class="cabin-feat">👨‍👩‍👧 7 personas</span>
+          <span class="cabin-feat">🌿 Valle de Liébana</span>
+        </div>
+        <a class="cabin-cta" href="chalet-el-urogallo.html">Ver Chalet El Urogallo</a>
       </div>
     </div>
 
-    <button class="carousel-button-general prev-general">❮</button>
-    <button class="carousel-button-general next-general">❯</button>
-
-    <div class="carousel-indicators-general">
-      <div class="indicator-general active"></div>
-      <div class="indicator-general"></div>
-      <div class="indicator-general"></div>
-      <div class="indicator-general"></div>
-    </div>
   </div>
 </section>
 
@@ -223,32 +463,21 @@
   <h2>Reserva Online</h2>
   <div class="reserva-box">
 
-    <!-- Selección de cabaña -->
-    <label for="cabaña">Selecciona cabaña</label>
+    <label for="cabaña">Selecciona chalet</label>
     <select id="cabaña">
-      <option value="campanilla">Cabaña Campanilla</option>
-      <option value="tejo">Cabaña El Tejo</option>
+      <option value="rebeco">Chalet El Rebeco</option>
+      <option value="urogallo">Chalet El Urogallo</option>
     </select>
 
-    <!-- Selección de fechas con navegación -->
     <label for="fechas">Selecciona tus fechas</label>
-    
-    <!-- Contenedor de calendario con flechas -->
-    <div id="fechas-container">
-      <div id="mesAnterior">◀</div>
-      <div id="fechas"></div>
-      <div id="mesSiguiente">▶</div>
-    </div>
-    
-    <!-- Aviso fechas no disponibles -->
+    <div id="calendarioVisible"></div>
+
     <p id="avisoFechas" class="aviso-fechas" style="display:none;">
       ⚠️ Algunas fechas seleccionadas no están disponibles. Por favor elige otras.
     </p>
 
-    <!-- Mensaje de urgencia -->
     <div id="mensajeUrgencia" class="mensaje-urgencia"></div>
 
-    <!-- Datos personales -->
     <label for="nombre">Nombre completo</label>
     <input type="text" id="nombre" placeholder="Nombre">
 
@@ -258,61 +487,106 @@
     <label for="email">Email</label>
     <input type="email" id="email" placeholder="Email">
 
-    <!-- Botón calcular precio -->
     <button id="btnCalcular">Calcular precio</button>
-
-    <!-- Spinner -->
     <div class="spinner" id="spinner"></div>
 
-    <!-- Resultados de la reserva -->
     <div id="resultado" class="resumen-reserva" style="display:none;">
-
-      <p><strong>Cabaña seleccionada:</strong> 
-      <span id="cabañaSeleccionada"></span></p>
-
-      <p><strong>Fechas de estancia:</strong> 
-      <span id="fechasSeleccionadas" class="fechas-seleccionadas"></span></p>
-
+      <p><strong>Chalet seleccionado:</strong> <span id="cabañaSeleccionada"></span></p>
+      <p><strong>Fechas de estancia:</strong> <span id="fechasSeleccionadas" class="fechas-seleccionadas"></span></p>
       <p><strong>Total estancia:</strong> <span id="total"></span> €</p>
-
-      <p><strong>Descuento aplicado:</strong> 
-      <span id="descuento" class="descuento">0</span> €</p>
-
+      <p><strong>Descuento aplicado:</strong> <span id="descuento" class="descuento">0</span> €</p>
       <p><strong>Reserva ahora:</strong> 50 €</p>
-
-      <p><strong>Resto a pagar en alojamiento:</strong> 
-      <span id="resto"></span> €</p>
-
+      <p><strong>Resto a pagar en alojamiento:</strong> <span id="resto"></span> €</p>
       <button id="btnPagar">Pagar</button>
-
     </div>
 
   </div>
 </section>
+
+<!-- ===== RESERVAS PERSONALIZADAS ===== -->
 <section id="contacto">
   <h2>Reservas personalizadas</h2>
-  <p>A través del WhatsApp las reservas se gestionan directamente para una atención personalizada y sin intermediarios.</p>
-  <p>📱 <a href="https://wa.me/34620419157">WhatsApp 620 419 157</a></p>
+  <div style="background:#1a2f3d; border-radius:16px; padding:20px; margin-top:16px; text-align:center;">
+    <p style="color:#a8c9d8; font-size:14px; line-height:1.6; margin-bottom:16px;">
+      Las reservas se gestionan directamente por WhatsApp para una atención personalizada y sin intermediarios.
+    </p>
+    <a href="https://wa.me/34620419157" style="display:inline-flex; align-items:center; gap:8px; background:#25D366; color:#fff; text-decoration:none; border-radius:12px; padding:13px 22px; font-size:14px; font-weight:500;">
+      📱 WhatsApp 620 419 157
+    </a>
+  </div>
 </section>
 
+<!-- ===== QUÉ HACER EN LA ZONA ===== -->
+<section>
+  <h2>Qué hacer en la zona</h2>
+  <p>El Valle de Liébana y los Picos de Europa ofrecen una gran variedad de actividades y lugares que visitar durante tu estancia.</p>
+  <div class="turismo-grid">
+
+    <a class="turismo-card" href="https://www.turismodecantabria.com/descubrela/parques-naturales/2-parque-nacional-de-los-picos-de-europa" target="_blank" rel="noopener">
+      <img src="images/picos.jpg" alt="Picos de Europa">
+      <div class="turismo-card-body">
+        <h3>Parque Nacional Picos de Europa</h3>
+        <span>turismodecantabria.com →</span>
+      </div>
+    </a>
+
+    <a class="turismo-card" href="https://www.turismodecantabria.com/descubrela/municipios/73-potes" target="_blank" rel="noopener">
+      <img src="images/potes.jpg" alt="Potes">
+      <div class="turismo-card-body">
+        <h3>Potes</h3>
+        <span>Descubre la villa →</span>
+      </div>
+    </a>
+
+    <a class="turismo-card" href="https://www.turismodecantabria.com/descubrela/espacios-naturales/13-desfiladero-de-la-hermida" target="_blank" rel="noopener">
+      <img src="images/hermida.jpg" alt="Desfiladero de La Hermida">
+      <div class="turismo-card-body">
+        <h3>Desfiladero de La Hermida</h3>
+        <span>turismodecantabria.com →</span>
+      </div>
+    </a>
+
+    <a class="turismo-card" href="https://www.liebana.es/santo-toribio/" target="_blank" rel="noopener">
+      <img src="images/santoribio.jpg" alt="Monasterio Santo Toribio">
+      <div class="turismo-card-body">
+        <h3>Monasterio de Santo Toribio</h3>
+        <span>liebana.es →</span>
+      </div>
+    </a>
+
+    <a class="turismo-card" href="https://fuente-de.es/" target="_blank" rel="noopener">
+      <img src="images/fuentede.jpg" alt="Teleférico de Fuente Dé">
+      <div class="turismo-card-body">
+        <h3>Teleférico de Fuente Dé</h3>
+        <span>fuente-de.es →</span>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<!-- ===== UBICACIÓN ===== -->
 <section>
   <h2>Ubicación</h2>
-  <p>📍 Complejo EL Lagunazo, Riópar</p>
-  <iframe src="https://www.google.com/maps?q=38.4880635,-2.4343093&z=17&output=embed" width="100%" height="350" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+  <p>📍 Bores, Valle de Liébana, Cantabria</p>
+  <iframe src="https://www.google.com/maps?q=Bores,+Cantabria,+España&z=13&output=embed" width="100%" height="350" style="border:0; border-radius:12px; margin-top:14px;" allowfullscreen="" loading="lazy"></iframe>
 </section>
 
 <footer>
   <p><a href="aviso-legal.html">Aviso Legal</a> | <a href="privacidad.html">Política de Privacidad</a> | <a href="cookies.html">Política de Cookies</a></p>
-  <p>© Cabañas Río Mundo · Riópar</p>
+  <p>© casasenpicosdeeuropa.es · Valle de Liébana · Picos de Europa</p>
 </footer>
 
 <a href="https://wa.me/34620419157" target="_blank" id="whatsappButton" title="Chatea con nosotros">
   <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" />
 </a>
 
-<!-- JS -->
+<div id="adminButton">🔒</div>
+
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
 <script src="js/main.js"></script>
+<script src="js/index-carousel.js"></script>
 
 </body>
 </html>
