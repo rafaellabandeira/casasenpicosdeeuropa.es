@@ -1,1 +1,281 @@
+/* ================= GLOBAL.CSS - CHALETS BORES (casasenpicosdeeuropa.es) ================= */
 
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body y tipografía */
+body {
+  font-family: 'Arial', sans-serif;
+  background: #f5f5f5;
+  color: #212121;
+  line-height: 1.6;
+}
+
+/* Enlaces */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Botones */
+.boton, button {
+  display: inline-block;
+  background: #2e5a6b;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.boton:hover, button:hover {
+  background: #1a2f3d;
+}
+
+/* Titulares */
+h1, h2, h3 {
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+/* ===== HERO PORTADA ===== */
+.hero {
+  position: relative;
+  height: 70vh;
+  min-height: 350px;
+  background: url('../images/hero-bores.jpg') center/cover no-repeat !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-align: center;
+  z-index: 1;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.35) !important;
+  z-index: 1;
+}
+
+.header-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.hero-title-top,
+.hero-title-bottom {
+  text-shadow: 0 3px 10px rgba(0,0,0,0.6);
+}
+
+.hero-title-top {
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.hero-title-bottom {
+  font-size: 28px;
+  color: #7dd3c8;
+  font-weight: 600;
+}
+
+.hero-sub {
+  font-size: 1.25rem;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* ====================== SECCIONES ====================== */
+section {
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* ====================== CHALETS ====================== */
+.cabanias-grid {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.cabin-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  flex: 1 1 300px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.cabin-card h3 {
+  color: #1a2f3d;
+}
+.cabin-card p {
+  color: #555;
+}
+.cabin-card .boton {
+  margin-top: 10px;
+}
+
+/* ====================== FOOTER ====================== */
+footer {
+  background: #1a2f3d;
+  color: #fff;
+  text-align: center;
+  padding: 20px;
+  margin-top: 40px;
+}
+footer a { color: #7dd3c8; }
+
+/* ====================== BOTÓN WHATSAPP ====================== */
+#whatsappButton {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  z-index: 1000;
+}
+#whatsappButton img {
+  width: 100%;
+  height: 100%;
+}
+
+/* ====================== RESPONSIVE ====================== */
+@media (max-width: 768px) {
+  .cabanias-grid { flex-direction: column; }
+  .nav-menu { flex-direction: column; gap: 10px; }
+  .hero-title { font-size: 2rem; }
+  .hero-sub { font-size: 1rem; }
+}
+
+/* Animación precio */
+.animar-precio {
+  animation: flashPrecio .5s ease-in-out;
+}
+
+@keyframes flashPrecio {
+  0%  { transform: scale(1);    color: #000; }
+  50% { transform: scale(1.2);  color: #2e5a6b; }
+  100%{ transform: scale(1);    color: #000; }
+}
+
+/* Resto a pagar destacado */
+.resaltar-resto {
+  background: #2e5a6b;
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: .5s;
+}
+
+/* ===== MENSAJE URGENCIA ===== */
+.mensaje-urgencia {
+  margin-top: 10px;
+  padding: 8px;
+  font-size: 14px;
+  background: #fff3cd;
+  border-left: 4px solid #ff9800;
+  border-radius: 4px;
+}
+
+/* ===== RESTO A PAGAR EN DESTINO ===== */
+#resto {
+  color: #e53935;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+.resaltar-resto {
+  animation: popResto 0.4s ease;
+}
+@keyframes popResto {
+  0%  { transform: scale(1); }
+  50% { transform: scale(1.25); }
+  100%{ transform: scale(1); }
+}
+
+/* ===== FECHAS SELECCIONADAS ===== */
+.fechas-seleccionadas {
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 0.95rem;
+  color: #333;
+  line-height: 1.4;
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #d4eaf0;
+  animation: aparecerFechas 0.3s ease;
+}
+.fechas-seleccionadas span {
+  display: block;
+}
+.fechas-seleccionadas .entrada-salida {
+  white-space: nowrap;
+}
+@keyframes aparecerFechas {
+  from { opacity: 0; transform: translateY(-3px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ====================== CARRUSEL ====================== */
+.carousel-container-general,
+.carousel-container {
+  position: relative;
+  overflow: hidden;
+  max-width: 100%;
+  margin: 20px auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  background: #fff;
+}
+
+.carousel-general-slides {
+  display: flex;
+  transition: transform 0.6s ease-in-out;
+  width: 100%;
+}
+
+.carousel-slide-general {
+  min-width: 100%;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.carousel-slide-general img {
+  width: 100% !important;
+  height: 250px !important;
+  object-fit: cover !important;
+  display: block;
+}
+
+.carousel-button-general {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(46, 90, 107, 0.9);
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  font-size: 1.8rem;
+  cursor: pointer;
+  z-index: 10;
+  border-radius: 50%;
+}
+
+.prev-general { left: 12px; }
+.next-general { right: 12px; }
