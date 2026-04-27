@@ -1,1 +1,81 @@
 
+/* ================= INDEX.CSS - CHALETS BORES (casasenpicosdeeuropa.es) ================= */
+
+* { box-sizing: border-box; }
+
+/* Básicos */
+body { font-family: Arial, sans-serif; }
+
+/* Navbar y Hero */
+.navbar {
+  background: #1a2f3d;
+  padding: 6px 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.hero {
+  background-image: url('/images/hero-bores.jpg');
+  background-size: cover;
+  background-position: center;
+  height: 70vh;
+  min-height: 350px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  color: #fff;
+  text-align: center;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+}
+
+/* Motor de reservas */
+.reserva-box {
+  max-width: 720px;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 3px solid #2e5a6b;
+  border-radius: 14px;
+  padding: 28px 26px;
+  box-shadow: 0 8px 28px rgba(46, 90, 107, 0.18);
+}
+
+/* Resto básico */
+section { padding: 40px 20px; max-width: 1200px; margin: auto; }
+.cabanias-grid { display: flex; gap: 20px; flex-wrap: wrap; }
+.cabin-card { flex: 1 1 300px; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+/* Días pasados */
+.flatpickr-day.pasado,
+.flatpickr-day.prevMonthDay,
+.flatpickr-day.nextMonthDay {
+  background: #212121 !important;
+  color: #aaa !important;
+}
+
+/* Cabecera completa */
+.flatpickr-months .flatpickr-prev-month,
+.flatpickr-months .flatpickr-next-month {
+  color: white !important;
+  fill: white !important;
+}
+
+/* Selección de rango */
+.flatpickr-day.inRange {
+  background: #a8cdd6 !important;
+  color: #000 !important;
+}
+
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+  background: #2e5a6b !important;
+  color: #fff !important;
+}
