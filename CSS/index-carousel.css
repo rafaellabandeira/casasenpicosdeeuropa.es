@@ -1,1 +1,146 @@
+/* Contenedor general del carrusel */
+.carousel-container-general {
+  position: relative;
+  width: 100%;
+  max-width: 1000px;
+  margin: 30px auto;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* Slides */
+.carousel-general-slides {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  width: 100%;
+}
+
+/* Cada slide */
+.carousel-slide-general {
+  min-width: 100%;
+  box-sizing: border-box;
+  display: none;
+}
+
+/* SLIDE ACTIVO */
+.carousel-slide-general.active {
+  display: block;
+}
+
+/* Imagen por defecto (móvil) */
+.carousel-slide-general img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+}
+
+/* Botones prev / next */
+.carousel-button-general {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0,0,0,0.5);
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  font-size: 22px;
+  transition: background-color 0.3s;
+}
+
+.carousel-button-general:hover {
+  background-color: rgba(0,0,0,0.7);
+}
+
+.prev-general {
+  left: 15px;
+}
+
+.next-general {
+  right: 15px;
+}
+
+/* Indicadores (dots) */
+.carousel-indicators-general {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+}
+
+.carousel-indicators-general button {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  background-color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.carousel-indicators-general button.active {
+  background-color: rgba(255,255,255,0.9);
+}
+
+/* Responsive botones */
+@media (max-width: 768px) {
+  .carousel-button-general {
+    padding: 8px;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel-indicators-general {
+    gap: 5px;
+  }
+}
+
+/* ===========================================================
+   CORRECCIÓN DEFINITIVA: FOTOS COMPLETAS EN PC (sin recortes)
+   =========================================================== */
+
+@media (min-width: 769px) {
+
+  /* El slide se convierte en contenedor centrado */
+  .carousel-slide-general {
+    height: 500px;                 /* altura fija en PC */
+    display: none;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #000;              /* fondo elegante */
+    border-radius: 12px;
+  }
+
+  .carousel-slide-general.active {
+    display: flex;                 /* necesario */
+  }
+
+  /* Imagen centrada y completa */
+  .carousel-slide-general img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;           /* NO recorta */
+    border-radius: 0;
+  }
+}
+
+/* ===========================================================
+   MÓVIL → fotos como antes (cover y ocupan toda la tarjeta)
+   =========================================================== */
+@media (max-width: 768px) {
+  .carousel-slide-general img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;             /* llena sin dejar bandas negras */
+    border-radius: 12px;
+  }
+}
 
