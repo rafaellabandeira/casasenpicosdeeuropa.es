@@ -1,1 +1,321 @@
+/* =============================================
+   STYLE.CSS - CHALETS BORES (casasenpicosdeeuropa.es)
+   ============================================= */
 
+:root {
+  --primary: #2e5a6b;
+  --primary-dark: #1a2f3d;
+  --accent: #7dd3c8;
+  --text: #333;
+  --gray: #555;
+  --danger: #d32f2f;
+}
+
+/* ====================== GENERAL ====================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  line-height: 1.6;
+  color: var(--text);
+  background-color: #f8f5f0;
+}
+
+/* ====================== TARJETAS CHALETS ====================== */
+
+.cabanias-grid {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.cabin-card {
+  flex: 1 1 300px;
+  max-width: 360px;
+  background: white;
+  border: 4px solid var(--primary);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  transition: all 0.3s ease;
+}
+
+.cabin-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--primary-dark);
+}
+
+.cabin-card img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+}
+
+@media (min-width: 800px) {
+  .cabin-card img {
+    height: 260px;
+    object-fit: contain;
+    background-color: #000;
+  }
+}
+
+.cabin-card h3 {
+  color: var(--primary-dark);
+  margin: 12px 0 6px;
+  font-size: 1.45rem;
+  text-align: center;
+}
+
+.cabin-card p {
+  padding: 0 16px 12px;
+  color: var(--gray);
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.cabin-card .boton {
+  display: block;
+  width: 90%;
+  margin: 8px auto 16px;
+  padding: 11px 20px;
+  background: var(--primary);
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  text-align: center;
+  transition: 0.3s;
+}
+
+.cabin-card .boton:hover {
+  background: var(--primary-dark);
+  transform: scale(1.03);
+}
+
+/* ====================== MOTOR DE RESERVAS ====================== */
+
+.reserva-box {
+  background: white;
+  border: 4px solid var(--primary);
+  border-radius: 16px;
+  padding: 30px;
+  max-width: 560px;
+  margin: 40px auto;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+
+.reserva-box select,
+.reserva-box input {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 15px;
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+#btnCalcular {
+  width: 100%;
+  display: block;
+  padding: 12px;
+  background: var(--primary);
+  color: white;
+  border-radius: 8px;
+  border: none;
+  font-size: 1.1rem;
+  margin-top: 10px;
+}
+
+/* ====================== FLATPICKR ====================== */
+
+.flatpickr-calendar {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 12px auto !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
+}
+
+.flatpickr-months {
+  background: var(--primary-dark) !important;
+  color: white !important;
+  padding: 6px 0 !important;
+}
+
+.flatpickr-current-month {
+  font-size: 1.05rem !important;
+}
+
+.flatpickr-days,
+.dayContainer {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: unset !important;
+}
+
+.flatpickr-day {
+  height: 34px !important;
+  line-height: 34px !important;
+  font-size: 13px !important;
+  border-radius: 6px !important;
+  max-width: 14.28% !important;
+  flex-basis: 14.28% !important;
+}
+
+.flatpickr-day.prevMonthDay,
+.flatpickr-day.nextMonthDay {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* ===== COLORES CALENDARIO ===== */
+
+.dia-pasado {
+  background: #ffc1c1 !important;
+  color: #b71c1c !important;
+  text-decoration: line-through;
+}
+
+.dia-reservado {
+  background: #ffcdd2 !important;
+  color: #c62828 !important;
+  cursor: not-allowed;
+}
+
+.flatpickr-day.dia-bloqueado,
+.flatpickr-day.dia-bloqueado.flatpickr-disabled {
+  background: #ffc1c1 !important;
+  color: #b71c1c !important;
+  text-decoration: line-through;
+  cursor: not-allowed !important;
+  opacity: 1 !important;
+}
+
+.dia-libre {
+  background: #d4eaf0 !important;
+  color: #1a2f3d !important;
+}
+
+.dia-libre:hover {
+  background: #2e5a6b !important;
+  color: white !important;
+}
+
+/* Día seleccionado por el usuario */
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange,
+.flatpickr-day.inRange {
+  background-color: #64b5f6 !important;
+  color: white !important;
+}
+
+/* ====================== RESPONSIVE ====================== */
+
+@media (max-width: 480px) {
+  .flatpickr-calendar {
+    padding: 4px !important;
+  }
+
+  .flatpickr-day {
+    height: 32px !important;
+    line-height: 32px !important;
+    font-size: 12.8px !important;
+  }
+
+  .flatpickr-days {
+    gap: 1px !important;
+    padding: 4px !important;
+  }
+
+  .cabin-card {
+    max-width: 340px;
+  }
+
+  .reserva-box select,
+  .reserva-box input {
+    font-size: 1rem;
+  }
+
+  .hero,
+  .carousel-general-slides img,
+  .carousel-slide img {
+    height: auto;
+    object-fit: cover;
+  }
+}
+
+@media (max-width: 360px) {
+  .flatpickr-day {
+    height: 31px !important;
+    line-height: 31px !important;
+    font-size: 12.5px !important;
+  }
+}
+
+/* ====================== HERO Y CARRUSELES 16:9 ====================== */
+
+.hero,
+.carousel-slide img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+/* ====================== CARRUSEL GENERAL ====================== */
+
+.carousel-container-general {
+  max-width: 800px !important;
+  margin: 20px auto !important;
+}
+
+.carousel-slide-general img {
+  width: 100% !important;
+  height: 450px !important;
+  object-fit: cover !important;
+  display: block;
+}
+
+@media (max-width: 767px) {
+  .carousel-slide-general img {
+    height: 250px !important;
+  }
+}
+
+/* ====================== LOGO NAV ====================== */
+
+.nav-logo {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+  color: var(--primary);
+}
+
+.nav-logo::before {
+  content: "🏔️";
+  font-size: 2.5rem;
+  line-height: 1;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+@media (max-width: 600px) {
+  .nav-logo {
+    font-size: 1.6rem;
+    gap: 6px;
+  }
+  .nav-logo::before {
+    font-size: 2rem;
+  }
+}
