@@ -16,6 +16,7 @@ function formatearLocal(fecha) {
 const BIN_ID = "69eefe35aaba882197405520";
 const API_KEY = "$2a$10$OSt3X0LKRYNW/3u8GoYsguuf1knig5JSICRCwUusGqtyBvFsNvJ4W";
 const BACKEND_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+const ADMIN_PASSWORD = "bores2024";
 
 async function cargarReservasBackend() {
   try {
@@ -82,8 +83,6 @@ document.addEventListener("mouseup", async () => {
   arrastreActivo = false;
   if (rangoSeleccionado.length === 0) return;
 
-  const chalet = document.getElementById("cabaña").value;
-
   for (const fecha of rangoSeleccionado) {
     if (!bloqueosFlatpickr.includes(fecha)) {
       bloqueosFlatpickr.push(fecha);
@@ -126,7 +125,6 @@ function inicializarFlatpickr() {
       dayElem.classList.add(clase);
       if (clase === "dia-bloqueado") dayElem.classList.add("flatpickr-disabled");
 
-      // ===== DOBLE CLICK PARA BLOQUEAR/DESBLOQUEAR (solo admin) =====
       dayElem.addEventListener("dblclick", async () => {
         if (!adminActivo) return;
         const fechaISO = fechaLocal(dayElem.dateObj);
@@ -156,7 +154,6 @@ function inicializarFlatpickr() {
         flatpickrInstance.redraw();
       });
 
-      // ===== ARRASTRAR PARA BLOQUEAR RANGO (solo admin) =====
       dayElem.addEventListener("mousedown", () => {
         if (!adminActivo) return;
         arrastreActivo = true;
@@ -233,9 +230,9 @@ function calcularReserva() {
     return;
   }
 
-  const spinner  = document.getElementById("spinner");
+  const spinner   = document.getElementById("spinner");
   const resultado = document.getElementById("resultado");
-  spinner.style.display  = "block";
+  spinner.style.display   = "block";
   resultado.style.display = "none";
 
   setTimeout(() => {
@@ -264,9 +261,9 @@ function calcularReserva() {
 
     document.getElementById("cabañaSeleccionada").innerText =
       chalet === "rebeco" ? "Chalet El Rebeco" : "Chalet El Urogallo";
-    document.getElementById("total").innerText    = total.toFixed(2);
+    document.getElementById("total").innerText     = total.toFixed(2);
     document.getElementById("descuento").innerText = descuento.toFixed(2);
-    document.getElementById("resto").innerText    = (total - 50).toFixed(2);
+    document.getElementById("resto").innerText     = (total - 50).toFixed(2);
 
     spinner.style.display   = "none";
     resultado.style.display = "block";
@@ -305,28 +302,6 @@ function actualizarUrgencia(fechasOcupadas) {
 }
 
 // ================================
-// 🔒 CANDADO ADMIN
-// ================================
-const ADMIN_PASSWORD = "bores2024";
-
-document.getElementById("adminButton")?.addEventListener("click", () => {
-  if (adminActivo) {
-    adminActivo = false;
-    document.getElementById("adminButton").style.backgroundColor = "#444";
-    alert("Modo administrador desactivado");
-    return;
-  }
-  const clave = prompt("Introduce la contraseña de administrador:");
-  if (clave === ADMIN_PASSWORD) {
-    adminActivo = true;
-    document.getElementById("adminButton").style.backgroundColor = "#2e5a6b";
-    alert("Modo administrador activado");
-  } else {
-    alert("Contraseña incorrecta");
-  }
-});
-
-// ================================
 // CARRUSEL + MENÚ
 // ================================
 function initCarousel(containerSelector, slideSelector, prevSelector, nextSelector, indicatorSelector) {
@@ -339,13 +314,13 @@ function initCarousel(containerSelector, slideSelector, prevSelector, nextSelect
     if (!slides.length) return;
 
     function showSlide(index) {
-      slides.forEach((s,i)     => { s.style.display = i === index ? "block" : "none"; });
+      slides.forEach((s,i)      => { s.style.display = i === index ? "block" : "none"; });
       indicators.forEach((ind,i) => { ind.classList.toggle("active", i === index); });
     }
 
     nextBtn?.addEventListener("click", () => { currentIndex = (currentIndex + 1) % slides.length; showSlide(currentIndex); });
     prevBtn?.addEventListener("click", () => { currentIndex = (currentIndex - 1 + slides.length) % slides.length; showSlide(currentIndex); });
-    indicators.forEach((ind,i) => { ind.addEventListener("click", () => { currentIndex = i; showSlide(currentIndex); }); });
+    indicators.forEach((ind,i)  => { ind.addEventListener("click", () => { currentIndex = i; showSlide(currentIndex); }); });
     showSlide(currentIndex);
   });
 }
@@ -373,6 +348,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("btnCalcular")?.addEventListener("click", calcularReserva);
   document.getElementById("btnPagar")?.addEventListener("click", reservar);
   document.getElementById("cabaña")?.addEventListener("change", prepararFlatpickr);
+
+  // ✅ Admin dentro del DOMContentLoaded
+  document.getElementById("adminButton")?.addEventListener("click", () => {
+    if (adminActivo) {
+      adminActivo = false;
+      document.getElementById("adminButton").style.backgroundColor = "#444";
+      alert("Modo administrador desactivado");
+      return;
+    }
+    const clave = prompt("Introduce la contraseña de administrador:");
+    if (clave === ADMIN_PASSWORD) {
+      adminActivo = true;
+      document.getElementById("adminButton").style.backgroundColor = "#2e5a6b";
+      alert("Modo administrador activado");
+    } else {
+      alert("Contraseña incorrecta");
+    }
+  });
 
   setInterval(async () => {
     const reservas = await cargarReservasBackend();
