@@ -273,13 +273,17 @@ function calcularReserva() {
 function esTemporadaAlta(fecha) {
   const mes = fecha.getMonth() + 1;
   const dia = fecha.getDate();
+  const dow = fecha.getDay(); // 5 = viernes, 6 = sábado
   return (
     mes === 7 ||
     mes === 8 ||
     (mes === 12 && dia >= 22) ||
-    (mes === 1  && dia <= 7)
+    (mes === 1  && dia <= 7) ||
+    dow === 5 ||
+    dow === 6
   );
 }
+
 
 function reservar() {
   alert("Aquí se conectará el pago de 50 €.");
