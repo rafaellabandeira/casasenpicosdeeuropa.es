@@ -158,20 +158,14 @@ function inicializarFlatpickr() {
 
         if (bloqueosFlatpickr.includes(fechaISO)) {
           bloqueosFlatpickr = bloqueosFlatpickr.filter(f => f !== fechaISO);
-          dayElem.classList.remove("dia-bloqueado", "dia-entrada-ocupada", "dia-salida", "flatpickr-disabled");
-          dayElem.classList.add("dia-libre");
-        } else {
+        } else if (!fechasOcupadasFlatpickr.includes(fechaISO)) {
           bloqueosFlatpickr.push(fechaISO);
-          dayElem.classList.remove("dia-libre", "dia-salida");
-          dayElem.classList.add("dia-bloqueado", "flatpickr-disabled");
         }
 
         datosCompletos[clave] = bloqueosFlatpickr;
         await guardarBloqueoEnBackend();
-        flatpickrInstance.set('disable', [
-          date => { const iso = fechaLocal(date); return esBloqueada(iso) && !esPrimerDiaBloque(iso); }
-        ]);
-        flatpickrInstance.redraw();
+        // Reinicializar el calendario para que todos los días vecinos se repinten correctamente
+        inicializarFlatpickr();
       });
 
       dayElem.addEventListener("mousedown", () => {
@@ -189,6 +183,13 @@ function inicializarFlatpickr() {
           dayElem.style.background = "rgba(0,123,255,0.4)";
         }
       });
+    },
+
+    onMonthChange: function(selectedDates, dateStr, instance) {
+      // Si hay una fecha de inicio seleccionada, la preservamos al cambiar de mes
+      if (selectedDates.length === 1) {
+        instance.setDate(selectedDates[0], false);
+      }
     },
 
     onChange: function(selectedDates) {
