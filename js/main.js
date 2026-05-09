@@ -7,8 +7,6 @@ function fechaLocal(date) {
   return `${y}-${m}-${d}`;
 }
 
-function formatearLocal(fecha) { return fechaLocal(fecha); }
-
 // ===== JSONBIN - BACKEND BORES =====
 const BIN_ID = "69eefe35aaba882197405520";
 const API_KEY = "$2a$10$OSt3X0LKRYNW/3u8GoYsguuf1knig5JSICRCwUusGqtyBvFsNvJ4W";
@@ -17,23 +15,20 @@ const ADMIN_PASSWORD = "8111";
 
 async function cargarReservasBackend() {
   try {
-    const res = await fetch(BACKEND_URL + "/latest", {
-      headers: { "X-Master-Key": API_KEY }
-    });
-    if (!res.ok) throw new Error("No se pudo cargar las reservas");
-    const json = await res.json();
-    const data = json.record;
+    const res = await fetch(BACKEND_URL + "/latest", { headers: { "X-Master-Key": API_KEY } });
+    if (!res.ok) throw new Error("Error cargando reservas");
+    const data = (await res.json()).record;
     return {
-      rebeco:            data.rebeco?.map(f => f.slice(0, 10))            || [],
-      urogallo:          data.urogallo?.map(f => f.slice(0, 10))          || [],
-      armino:            data.armino?.map(f => f.slice(0, 10))            || [],
-      bloqueos_rebeco:   data.bloqueados_rebeco                            || [],
-      bloqueos_urogallo: data.bloqueados_urogallo                          || [],
-      bloqueos_armino:   data.bloqueados_armino                            || []
+      rebeco:            data.rebeco?.map(f => f.slice(0,10))   || [],
+      urogallo:          data.urogallo?.map(f => f.slice(0,10)) || [],
+      armino:            data.armino?.map(f => f.slice(0,10))   || [],
+      bloqueos_rebeco:   data.bloqueados_rebeco   || [],
+      bloqueos_urogallo: data.bloqueados_urogallo || [],
+      bloqueos_armino:   data.bloqueados_armino   || []
     };
-  } catch (err) {
+  } catch(err) {
     console.error(err);
-    return { rebeco: [], urogallo: [], armino: [], bloqueos_rebeco: [], bloqueos_urogallo: [], bloqueos_armino: [] };
+    return { rebeco:[], urogallo:[], armino:[], bloqueos_rebeco:[], bloqueos_urogallo:[], bloqueos_armino:[] };
   }
 }
 
@@ -55,47 +50,39 @@ let flatpickrInstance;
 let arrastreActivo = false;
 let rangoSeleccionado = [];
 let adminActivo = false;
-let fechaInicioGuardada = null;
 let datosCompletos = {};
+// Rango manual (para permitir selección entre meses)
+let rangoInicio = null;
+let rangoFin = null;
 
 // ================================
 // HELPERS DE FECHAS
 // ================================
-
 function esBloqueada(fechaISO) {
   return fechasOcupadasFlatpickr.includes(fechaISO) || bloqueosFlatpickr.includes(fechaISO);
 }
-
 function sumarDias(fechaISO, dias) {
   const d = new Date(fechaISO + "T12:00:00");
   d.setDate(d.getDate() + dias);
   return fechaLocal(d);
 }
-
 function esPrimerDiaBloque(fechaISO) {
   return esBloqueada(fechaISO) && !esBloqueada(sumarDias(fechaISO, -1));
 }
-
-function esUltimoDiaBloque(fechaISO) {
-  return esBloqueada(fechaISO) && !esBloqueada(sumarDias(fechaISO, 1));
-}
-
 function esDiaIntermedio(fechaISO) {
   return esBloqueada(fechaISO) && esBloqueada(sumarDias(fechaISO, -1)) && esBloqueada(sumarDias(fechaISO, 1));
 }
 
 // ================================
-// CALENDARIO FLATPICKR
+// COLORES CALENDARIO
 // ================================
-
 function colorearDias(date) {
-  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
   const fechaISO = fechaLocal(date);
   const fechaAyer = sumarDias(fechaISO, -1);
   const fechaManana = sumarDias(fechaISO, 1);
 
   if (date < hoy) return "dia-pasado";
-
   if (!esBloqueada(fechaISO) && esBloqueada(fechaAyer)) return "dia-salida";
   if (!esBloqueada(fechaISO) && esBloqueada(fechaManana)) return "dia-libre";
   if (!esBloqueada(fechaISO)) return "dia-libre";
@@ -103,81 +90,148 @@ function colorearDias(date) {
   return "dia-bloqueado";
 }
 
+// ================================
+// GESTIÓN MANUAL DEL RANGO
+// ================================
+function limpiarSeleccionVisual() {
+  document.querySelectorAll(".flatpickr-day").forEach(d => {
+    d.classList.remove("startRange", "inRange", "endRange", "selected");
+  });
+}
+
+function pintarRangoVisual(inicio, fin) {
+  limpiarSeleccionVisual();
+  document.querySelectorAll(".flatpickr-day").forEach(d => {
+    if (!d.dateObj) return;
+    const f = new Date(d.dateObj); f.setHours(0,0,0,0);
+    const i = new Date(inicio); i.setHours(0,0,0,0);
+    const e = new Date(fin); e.setHours(0,0,0,0);
+    if (f.getTime() === i.getTime()) d.classList.add("startRange", "selected");
+    else if (f.getTime() === e.getTime()) d.classList.add("endRange", "selected");
+    else if (f > i && f < e) d.classList.add("inRange");
+  });
+}
+
+function validarRango(inicio, fin) {
+  const isoInicio = fechaLocal(inicio);
+  const isoFin = fechaLocal(fin);
+
+  if (esBloqueada(isoInicio) && esPrimerDiaBloque(isoInicio)) {
+    alert("No puedes iniciar la reserva en ese día.");
+    return false;
+  }
+  let check = new Date(inicio); check.setDate(check.getDate() + 1);
+  while (check < fin) {
+    const iso = fechaLocal(check);
+    if (esBloqueada(iso)) {
+      alert("No puedes seleccionar un rango que incluye fechas ya reservadas.");
+      return false;
+    }
+    check.setDate(check.getDate() + 1);
+  }
+  if (esBloqueada(isoFin) && !esPrimerDiaBloque(isoFin)) {
+    alert("No puedes terminar la reserva en ese día.");
+    return false;
+  }
+  return true;
+}
+
+// ================================
+// FLATPICKR
+// ================================
 document.addEventListener("mouseup", async () => {
   if (!arrastreActivo) return;
   arrastreActivo = false;
   if (rangoSeleccionado.length === 0) return;
-
   for (const fecha of rangoSeleccionado) {
     if (!bloqueosFlatpickr.includes(fecha)) {
       bloqueosFlatpickr.push(fecha);
-      flatpickrInstance.days.childNodes.forEach(d => {
-        if (d.dateObj && fechaLocal(d.dateObj) === fecha) {
-          d.classList.remove("dia-libre");
-          d.classList.add("dia-bloqueado", "flatpickr-disabled");
-        }
-      });
     }
   }
-
   await guardarBloqueoEnBackend();
-  flatpickrInstance.set("disable", [
-    date => { const iso = fechaLocal(date); return esBloqueada(iso) && !esPrimerDiaBloque(iso); }
-  ]);
-  flatpickrInstance.redraw();
+  inicializarFlatpickr();
   rangoSeleccionado = [];
 });
 
 function inicializarFlatpickr() {
   if (flatpickrInstance) flatpickrInstance.destroy();
+  rangoInicio = null;
+  rangoFin = null;
 
   flatpickrInstance = flatpickr("#calendarioVisible", {
     inline: true,
-    mode: "range",
+    mode: "single",
     locale: "es",
     dateFormat: "d-m-Y",
-
-    disable: [],
-
-    onMonthChange: function(selectedDates, dateStr, instance) {
-      // Preservar fecha de inicio al navegar entre meses
-      if (fechaInicioGuardada) {
-        setTimeout(() => {
-          instance.setDate([fechaInicioGuardada], false);
-        }, 0);
-      }
-    },
+    disableMobile: true,
 
     onDayCreate: function(dObj, dStr, fp, dayElem) {
       const fecha = new Date(dayElem.dateObj);
       const clase = colorearDias(fecha);
       dayElem.classList.add(clase);
 
-      if (clase === "dia-bloqueado") {
-        dayElem.classList.add("flatpickr-disabled");
-      }
+      // Click para selección de rango (usuarios normales)
+      dayElem.addEventListener("click", () => {
+        if (adminActivo) return;
 
+        const hoy = new Date(); hoy.setHours(0,0,0,0);
+        if (fecha < hoy) return;
+        if (clase === "dia-bloqueado") return;
+
+        const fechaISO = fechaLocal(fecha);
+
+        if (!rangoInicio) {
+          // Primer click: inicio del rango
+          if (esBloqueada(fechaISO) && !esPrimerDiaBloque(fechaISO)) return;
+          rangoInicio = new Date(fecha);
+          rangoFin = null;
+          limpiarSeleccionVisual();
+          dayElem.classList.add("startRange", "selected");
+        } else {
+          // Segundo click: fin del rango
+          const fin = new Date(fecha);
+          if (fin <= rangoInicio) {
+            // Click antes del inicio: reiniciar
+            rangoInicio = new Date(fecha);
+            rangoFin = null;
+            limpiarSeleccionVisual();
+            dayElem.classList.add("startRange", "selected");
+            return;
+          }
+          if (!validarRango(rangoInicio, fin)) {
+            rangoInicio = null;
+            rangoFin = null;
+            limpiarSeleccionVisual();
+            return;
+          }
+          rangoFin = fin;
+          pintarRangoVisual(rangoInicio, rangoFin);
+          // Mostrar fechas seleccionadas
+          const opciones = { year: "numeric", month: "long", day: "numeric" };
+          document.getElementById("fechasSeleccionadas").textContent =
+            `${rangoInicio.toLocaleDateString("es-ES", opciones)} → ${rangoFin.toLocaleDateString("es-ES", opciones)}`;
+        }
+      });
+
+      // Doble click para admin: bloquear/desbloquear
       dayElem.addEventListener("dblclick", async () => {
         if (!adminActivo) return;
-        const fechaISO = fechaLocal(dayElem.dateObj);
-        const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
-        if (dayElem.dateObj < hoy) return;
-
+        const fechaISO = fechaLocal(fecha);
+        const hoy = new Date(); hoy.setHours(0,0,0,0);
+        if (fecha < hoy) return;
         const chalet = document.getElementById("cabaña").value;
-        const clave = `bloqueados_${chalet}`;
 
         if (bloqueosFlatpickr.includes(fechaISO)) {
           bloqueosFlatpickr = bloqueosFlatpickr.filter(f => f !== fechaISO);
         } else if (!fechasOcupadasFlatpickr.includes(fechaISO)) {
           bloqueosFlatpickr.push(fechaISO);
         }
-
-        datosCompletos[clave] = bloqueosFlatpickr;
+        datosCompletos[`bloqueados_${chalet}`] = bloqueosFlatpickr;
         await guardarBloqueoEnBackend();
-        // Reinicializar el calendario para que todos los días vecinos se repinten correctamente
         inicializarFlatpickr();
       });
 
+      // Mousedown/enter para arrastre admin
       dayElem.addEventListener("mousedown", () => {
         if (!adminActivo) return;
         arrastreActivo = true;
@@ -186,62 +240,13 @@ function inicializarFlatpickr() {
 
       dayElem.addEventListener("mouseenter", () => {
         if (!arrastreActivo || !adminActivo) return;
-        const fechaISO = fechaLocal(dayElem.dateObj);
-        const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
-        if (dayElem.dateObj >= hoy && !bloqueosFlatpickr.includes(fechaISO)) {
+        const fechaISO = fechaLocal(fecha);
+        const hoy = new Date(); hoy.setHours(0,0,0,0);
+        if (fecha >= hoy && !bloqueosFlatpickr.includes(fechaISO)) {
           rangoSeleccionado.push(fechaISO);
           dayElem.style.background = "rgba(0,123,255,0.4)";
         }
       });
-    },
-
-    onChange: function(selectedDates) {
-      if (selectedDates.length === 1) {
-        fechaInicioGuardada = selectedDates[0];
-        return;
-      }
-      if (selectedDates.length === 0) {
-        fechaInicioGuardada = null;
-        return;
-      }
-      if (selectedDates.length === 2) {
-        fechaInicioGuardada = null;
-        const inicio = selectedDates[0];
-        const fin = selectedDates[1];
-        const isoInicio = fechaLocal(inicio);
-        const isoFin = fechaLocal(fin);
-
-        if (esBloqueada(isoInicio) && esPrimerDiaBloque(isoInicio)) {
-          flatpickrInstance.clear();
-          document.getElementById("fechasSeleccionadas").textContent = "";
-          alert("No puedes iniciar la reserva en ese día. Elige otro día de entrada.");
-          return;
-        }
-
-        let check = new Date(inicio);
-        check.setDate(check.getDate() + 1);
-        while (check < fin) {
-          const iso = fechaLocal(check);
-          if (esBloqueada(iso)) {
-            flatpickrInstance.clear();
-            document.getElementById("fechasSeleccionadas").textContent = "";
-            alert("No puedes seleccionar un rango que incluye fechas ya reservadas.");
-            return;
-          }
-          check.setDate(check.getDate() + 1);
-        }
-
-        if (esBloqueada(isoFin) && !esPrimerDiaBloque(isoFin)) {
-          flatpickrInstance.clear();
-          document.getElementById("fechasSeleccionadas").textContent = "";
-          alert("No puedes terminar la reserva en ese día. Elige otro día de salida.");
-          return;
-        }
-
-        const opciones = { year: "numeric", month: "long", day: "numeric" };
-        document.getElementById("fechasSeleccionadas").textContent =
-          `${inicio.toLocaleDateString("es-ES", opciones)} → ${fin.toLocaleDateString("es-ES", opciones)}`;
-      }
     }
   });
 }
@@ -250,18 +255,16 @@ async function prepararFlatpickr() {
   const reservas = await cargarReservasBackend();
   reservasGlobal = reservas;
   datosCompletos = {
-    rebeco:             reservas.rebeco,
-    urogallo:           reservas.urogallo,
-    armino:             reservas.armino,
+    rebeco:              reservas.rebeco,
+    urogallo:            reservas.urogallo,
+    armino:              reservas.armino,
     bloqueados_rebeco:   reservas.bloqueos_rebeco,
     bloqueados_urogallo: reservas.bloqueos_urogallo,
     bloqueados_armino:   reservas.bloqueos_armino
   };
-
   const chalet = document.getElementById("cabaña").value;
   fechasOcupadasFlatpickr = reservas[chalet] || [];
   bloqueosFlatpickr = reservas[`bloqueos_${chalet}`] || [];
-
   inicializarFlatpickr();
 }
 
@@ -274,15 +277,15 @@ async function guardarBloqueoEnBackend() {
 // ================================
 // CÁLCULO DE RESERVA
 // ================================
-
 function calcularReserva() {
   const chalet = document.getElementById("cabaña").value;
-  if (!flatpickrInstance.selectedDates || flatpickrInstance.selectedDates.length < 2) {
+
+  if (!rangoInicio || !rangoFin) {
     alert("Selecciona un rango de fechas"); return;
   }
 
-  const inicio = flatpickrInstance.selectedDates[0];
-  const fin    = flatpickrInstance.selectedDates[1];
+  const inicio = rangoInicio;
+  const fin = rangoFin;
   const noches = Math.round((fin - inicio) / (1000*60*60*24));
   const nombre   = document.getElementById("nombre").value.trim();
   const telefono = document.getElementById("telefono").value.trim();
@@ -338,12 +341,7 @@ function esTemporadaAlta(fecha) {
   const mes = fecha.getMonth() + 1;
   const dia = fecha.getDate();
   const dow = fecha.getDay();
-  return (
-    mes === 7 || mes === 8 ||
-    (mes === 12 && dia >= 22) ||
-    (mes === 1  && dia <= 7) ||
-    dow === 5 || dow === 6
-  );
+  return (mes===7 || mes===8 || (mes===12&&dia>=22) || (mes===1&&dia<=7) || dow===5 || dow===6);
 }
 
 function reservar() { alert("Aquí se conectará el pago de 50 €."); }
@@ -355,12 +353,12 @@ function actualizarUrgencia(fechasOcupadas) {
   const mensaje = document.getElementById("mensajeUrgencia");
   if (!mensaje) return;
   const mes = new Date().getMonth() + 1;
-  const ocupadas = (fechasOcupadas.rebeco?.length || 0) + (fechasOcupadas.urogallo?.length || 0) + (fechasOcupadas.armino?.length || 0);
+  const ocupadas = (fechasOcupadas.rebeco?.length||0) + (fechasOcupadas.urogallo?.length||0) + (fechasOcupadas.armino?.length||0);
   let texto = "";
-  if (mes === 7 || mes === 8)  texto = "🔥 Verano es temporada alta. Te recomendamos reservar pronto.";
-  else if (ocupadas > 20)      texto = "⚡ Quedan pocas fechas disponibles este mes.";
-  else if (ocupadas > 10)      texto = "📅 Este alojamiento suele reservarse rápido.";
-  else                         texto = "✨ Reserva ahora para asegurar tus fechas.";
+  if (mes===7||mes===8)   texto = "🔥 Verano es temporada alta. Te recomendamos reservar pronto.";
+  else if (ocupadas>20)   texto = "⚡ Quedan pocas fechas disponibles este mes.";
+  else if (ocupadas>10)   texto = "📅 Este alojamiento suele reservarse rápido.";
+  else                    texto = "✨ Reserva ahora para asegurar tus fechas.";
   mensaje.innerText = texto;
 }
 
@@ -375,15 +373,13 @@ function initCarousel(containerSelector, slideSelector, prevSelector, nextSelect
     const indicators = container.querySelectorAll(indicatorSelector);
     let currentIndex = 0;
     if (!slides.length) return;
-
     function showSlide(index) {
-      slides.forEach((s,i)       => { s.style.display = i === index ? "block" : "none"; });
-      indicators.forEach((ind,i) => { ind.classList.toggle("active", i === index); });
+      slides.forEach((s,i)       => { s.style.display = i===index ? "block" : "none"; });
+      indicators.forEach((ind,i) => { ind.classList.toggle("active", i===index); });
     }
-
-    nextBtn?.addEventListener("click", () => { currentIndex = (currentIndex + 1) % slides.length; showSlide(currentIndex); });
-    prevBtn?.addEventListener("click", () => { currentIndex = (currentIndex - 1 + slides.length) % slides.length; showSlide(currentIndex); });
-    indicators.forEach((ind,i) => { ind.addEventListener("click", () => { currentIndex = i; showSlide(currentIndex); }); });
+    nextBtn?.addEventListener("click", () => { currentIndex=(currentIndex+1)%slides.length; showSlide(currentIndex); });
+    prevBtn?.addEventListener("click", () => { currentIndex=(currentIndex-1+slides.length)%slides.length; showSlide(currentIndex); });
+    indicators.forEach((ind,i) => { ind.addEventListener("click", () => { currentIndex=i; showSlide(currentIndex); }); });
     showSlide(currentIndex);
   });
 }
