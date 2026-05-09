@@ -51,7 +51,6 @@ let arrastreActivo = false;
 let rangoSeleccionado = [];
 let adminActivo = false;
 let datosCompletos = {};
-// Rango manual (para permitir selección entre meses)
 let rangoInicio = null;
 let rangoFin = null;
 
@@ -91,39 +90,18 @@ function colorearDias(date) {
 }
 
 // ================================
-// GESTIÓN MANUAL DEL RANGO
+// VALIDAR RANGO
 // ================================
-function limpiarSeleccionVisual() {
-  document.querySelectorAll(".flatpickr-day").forEach(d => {
-    d.classList.remove("startRange", "inRange", "endRange", "selected");
-  });
-}
-
-function pintarRangoVisual(inicio, fin) {
-  limpiarSeleccionVisual();
-  document.querySelectorAll(".flatpickr-day").forEach(d => {
-    if (!d.dateObj) return;
-    const f = new Date(d.dateObj); f.setHours(0,0,0,0);
-    const i = new Date(inicio); i.setHours(0,0,0,0);
-    const e = new Date(fin); e.setHours(0,0,0,0);
-    if (f.getTime() === i.getTime()) d.classList.add("startRange", "selected");
-    else if (f.getTime() === e.getTime()) d.classList.add("endRange", "selected");
-    else if (f > i && f < e) d.classList.add("inRange");
-  });
-}
-
 function validarRango(inicio, fin) {
   const isoInicio = fechaLocal(inicio);
   const isoFin = fechaLocal(fin);
-
   if (esBloqueada(isoInicio) && esPrimerDiaBloque(isoInicio)) {
     alert("No puedes iniciar la reserva en ese día.");
     return false;
   }
   let check = new Date(inicio); check.setDate(check.getDate() + 1);
   while (check < fin) {
-    const iso = fechaLocal(check);
-    if (esBloqueada(iso)) {
+    if (esBloqueada(fechaLocal(check))) {
       alert("No puedes seleccionar un rango que incluye fechas ya reservadas.");
       return false;
     }
@@ -137,16 +115,42 @@ function validarRango(inicio, fin) {
 }
 
 // ================================
-// FLATPICKR
+// PINTAR RANGO VISUAL
+// ================================
+function limpiarSeleccionVisual() {
+  document.querySelectorAll(".flatpickr-day").forEach(d => {
+    d.classList.remove("startRange", "inRange", "endRange", "selected");
+  });
+}
+
+function pintarRangoVisual() {
+  if (!rangoInicio) return;
+  limpiarSeleccionVisual();
+  document.querySelectorAll(".flatpickr-day").forEach(d => {
+    if (!d.dateObj) return;
+    const f = new Date(d.dateObj); f.setHours(0,0,0,0);
+    const i = new Date(rangoInicio); i.setHours(0,0,0,0);
+    if (f.getTime() === i.getTime()) {
+      d.classList.add("startRange", "selected");
+    }
+    if (rangoFin) {
+      const e = new Date(rangoFin); e.setHours(0,0,0,0);
+      if (f.getTime() === e.getTime()) d.classList.add("endRange", "selected");
+      else if (f > i && f < e) d.classList.add("inRange");
+    }
+  });
+}
+
+// ================================
+// FLATPICKR - modo range nativo
+// pero con navegación entre meses protegida
 // ================================
 document.addEventListener("mouseup", async () => {
   if (!arrastreActivo) return;
   arrastreActivo = false;
   if (rangoSeleccionado.length === 0) return;
   for (const fecha of rangoSeleccionado) {
-    if (!bloqueosFlatpickr.includes(fecha)) {
-      bloqueosFlatpickr.push(fecha);
-    }
+    if (!bloqueosFlatpickr.includes(fecha)) bloqueosFlatpickr.push(fecha);
   }
   await guardarBloqueoEnBackend();
   inicializarFlatpickr();
@@ -160,93 +164,123 @@ function inicializarFlatpickr() {
 
   flatpickrInstance = flatpickr("#calendarioVisible", {
     inline: true,
-    mode: "single",
+    mode: "range",
     locale: "es",
     dateFormat: "d-m-Y",
-    disableMobile: true,
+
+    onReady: function() {
+      // Interceptar botones de navegación para preservar rangoInicio
+      const cal = document.querySelector(".flatpickr-calendar");
+      if (!cal) return;
+      cal.querySelectorAll(".flatpickr-prev-month, .flatpickr-next-month").forEach(btn => {
+        btn.addEventListener("click", () => {
+          // Tras el cambio de mes, repintar el rango guardado
+          setTimeout(() => {
+            pintarRangoVisual();
+            // Reasignar listeners a los nuevos días
+            asignarListenersDias();
+          }, 50);
+        });
+      });
+    },
 
     onDayCreate: function(dObj, dStr, fp, dayElem) {
       const fecha = new Date(dayElem.dateObj);
       const clase = colorearDias(fecha);
       dayElem.classList.add(clase);
+      asignarListenerDia(dayElem, fecha, clase);
+    },
 
-      // Click para selección de rango (usuarios normales)
-      dayElem.addEventListener("click", () => {
-        if (adminActivo) return;
+    onChange: function() {
+      // Ignorar el onChange nativo — gestionamos el rango manualmente
+      flatpickrInstance.clear();
+    }
+  });
+}
 
-        const hoy = new Date(); hoy.setHours(0,0,0,0);
-        if (fecha < hoy) return;
-        if (clase === "dia-bloqueado") return;
+function asignarListenersDias() {
+  document.querySelectorAll(".flatpickr-day").forEach(dayElem => {
+    if (!dayElem.dateObj) return;
+    const fecha = new Date(dayElem.dateObj);
+    // Resetear clases de color
+    dayElem.className = "flatpickr-day";
+    const clase = colorearDias(fecha);
+    dayElem.classList.add(clase);
+    asignarListenerDia(dayElem, fecha, clase);
+  });
+  pintarRangoVisual();
+}
 
-        const fechaISO = fechaLocal(fecha);
+function asignarListenerDia(dayElem, fecha, clase) {
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
 
-        if (!rangoInicio) {
-          // Primer click: inicio del rango
-          if (esBloqueada(fechaISO) && !esPrimerDiaBloque(fechaISO)) return;
-          rangoInicio = new Date(fecha);
-          rangoFin = null;
-          limpiarSeleccionVisual();
-          dayElem.classList.add("startRange", "selected");
-        } else {
-          // Segundo click: fin del rango
-          const fin = new Date(fecha);
-          if (fin <= rangoInicio) {
-            // Click antes del inicio: reiniciar
-            rangoInicio = new Date(fecha);
-            rangoFin = null;
-            limpiarSeleccionVisual();
-            dayElem.classList.add("startRange", "selected");
-            return;
-          }
-          if (!validarRango(rangoInicio, fin)) {
-            rangoInicio = null;
-            rangoFin = null;
-            limpiarSeleccionVisual();
-            return;
-          }
-          rangoFin = fin;
-          pintarRangoVisual(rangoInicio, rangoFin);
-          // Mostrar fechas seleccionadas
-          const opciones = { year: "numeric", month: "long", day: "numeric" };
-          document.getElementById("fechasSeleccionadas").textContent =
-            `${rangoInicio.toLocaleDateString("es-ES", opciones)} → ${rangoFin.toLocaleDateString("es-ES", opciones)}`;
-        }
-      });
+  // Click normal: selección de rango
+  dayElem.addEventListener("click", (e) => {
+    if (adminActivo) return;
+    if (fecha < hoy) return;
+    if (clase === "dia-bloqueado") return;
 
-      // Doble click para admin: bloquear/desbloquear
-      dayElem.addEventListener("dblclick", async () => {
-        if (!adminActivo) return;
-        const fechaISO = fechaLocal(fecha);
-        const hoy = new Date(); hoy.setHours(0,0,0,0);
-        if (fecha < hoy) return;
-        const chalet = document.getElementById("cabaña").value;
+    e.stopPropagation();
 
-        if (bloqueosFlatpickr.includes(fechaISO)) {
-          bloqueosFlatpickr = bloqueosFlatpickr.filter(f => f !== fechaISO);
-        } else if (!fechasOcupadasFlatpickr.includes(fechaISO)) {
-          bloqueosFlatpickr.push(fechaISO);
-        }
-        datosCompletos[`bloqueados_${chalet}`] = bloqueosFlatpickr;
-        await guardarBloqueoEnBackend();
-        inicializarFlatpickr();
-      });
+    if (!rangoInicio) {
+      // Primer click
+      rangoInicio = new Date(fecha);
+      rangoFin = null;
+      limpiarSeleccionVisual();
+      dayElem.classList.add("startRange", "selected");
+    } else {
+      // Segundo click
+      if (fecha <= rangoInicio) {
+        // Reiniciar si click antes del inicio
+        rangoInicio = new Date(fecha);
+        rangoFin = null;
+        limpiarSeleccionVisual();
+        dayElem.classList.add("startRange", "selected");
+        return;
+      }
+      if (!validarRango(rangoInicio, fecha)) {
+        rangoInicio = null;
+        rangoFin = null;
+        limpiarSeleccionVisual();
+        return;
+      }
+      rangoFin = new Date(fecha);
+      pintarRangoVisual();
+      const opc = { year: "numeric", month: "long", day: "numeric" };
+      document.getElementById("fechasSeleccionadas").textContent =
+        `${rangoInicio.toLocaleDateString("es-ES", opc)} → ${rangoFin.toLocaleDateString("es-ES", opc)}`;
+    }
+  });
 
-      // Mousedown/enter para arrastre admin
-      dayElem.addEventListener("mousedown", () => {
-        if (!adminActivo) return;
-        arrastreActivo = true;
-        rangoSeleccionado = [];
-      });
+  // Doble click admin: bloquear/desbloquear
+  dayElem.addEventListener("dblclick", async () => {
+    if (!adminActivo) return;
+    if (fecha < hoy) return;
+    const fechaISO = fechaLocal(fecha);
+    const chalet = document.getElementById("cabaña").value;
+    if (bloqueosFlatpickr.includes(fechaISO)) {
+      bloqueosFlatpickr = bloqueosFlatpickr.filter(f => f !== fechaISO);
+    } else if (!fechasOcupadasFlatpickr.includes(fechaISO)) {
+      bloqueosFlatpickr.push(fechaISO);
+    }
+    datosCompletos[`bloqueados_${chalet}`] = bloqueosFlatpickr;
+    await guardarBloqueoEnBackend();
+    inicializarFlatpickr();
+  });
 
-      dayElem.addEventListener("mouseenter", () => {
-        if (!arrastreActivo || !adminActivo) return;
-        const fechaISO = fechaLocal(fecha);
-        const hoy = new Date(); hoy.setHours(0,0,0,0);
-        if (fecha >= hoy && !bloqueosFlatpickr.includes(fechaISO)) {
-          rangoSeleccionado.push(fechaISO);
-          dayElem.style.background = "rgba(0,123,255,0.4)";
-        }
-      });
+  // Mousedown/enter: arrastre admin
+  dayElem.addEventListener("mousedown", () => {
+    if (!adminActivo) return;
+    arrastreActivo = true;
+    rangoSeleccionado = [];
+  });
+
+  dayElem.addEventListener("mouseenter", () => {
+    if (!arrastreActivo || !adminActivo) return;
+    const fechaISO = fechaLocal(fecha);
+    if (fecha >= hoy && !bloqueosFlatpickr.includes(fechaISO)) {
+      rangoSeleccionado.push(fechaISO);
+      dayElem.style.background = "rgba(0,123,255,0.4)";
     }
   });
 }
@@ -279,11 +313,9 @@ async function guardarBloqueoEnBackend() {
 // ================================
 function calcularReserva() {
   const chalet = document.getElementById("cabaña").value;
-
   if (!rangoInicio || !rangoFin) {
     alert("Selecciona un rango de fechas"); return;
   }
-
   const inicio = rangoInicio;
   const fin = rangoFin;
   const noches = Math.round((fin - inicio) / (1000*60*60*24));
@@ -303,45 +335,40 @@ function calcularReserva() {
   resultado.style.display = "none";
 
   setTimeout(() => {
-    const opciones = { day: "numeric", month: "short" };
+    const opc = { day: "numeric", month: "short" };
     document.getElementById("fechasSeleccionadas").innerHTML =
-      `📅 ${inicio.toLocaleDateString("es-ES", opciones)} - ${fin.toLocaleDateString("es-ES", opciones)}<br>🛏 ${noches} ${noches === 1 ? "noche" : "noches"}`;
+      `📅 ${inicio.toLocaleDateString("es-ES", opc)} - ${fin.toLocaleDateString("es-ES", opc)}<br>🛏 ${noches} ${noches===1?"noche":"noches"}`;
 
     const minNoches = esTemporadaAlta(inicio) ? 4 : 2;
     if (noches < minNoches) {
       alert(`Mínimo ${minNoches} noches en estas fechas`);
-      spinner.style.display = "none";
-      return;
+      spinner.style.display = "none"; return;
     }
 
     let total = 0;
     for (let i = 0; i < noches; i++) {
-      const dia = new Date(inicio);
-      dia.setDate(dia.getDate() + i);
+      const dia = new Date(inicio); dia.setDate(dia.getDate() + i);
       total += esTemporadaAlta(dia) ? 130 : 85;
     }
 
     let descuento = 0;
-    if      (noches >= 6 &&  esTemporadaAlta(inicio)) descuento = total * 0.10;
-    else if (noches >= 3 && !esTemporadaAlta(inicio)) descuento = total * 0.10;
+    if      (noches>=6 &&  esTemporadaAlta(inicio)) descuento = total * 0.10;
+    else if (noches>=3 && !esTemporadaAlta(inicio)) descuento = total * 0.10;
     total -= descuento;
 
-    const nombres = { rebeco: "Chalet El Rebeco", urogallo: "Chalet El Urogallo", armino: "Chalet El Armiño" };
+    const nombres = { rebeco:"Chalet El Rebeco", urogallo:"Chalet El Urogallo", armino:"Chalet El Armiño" };
     document.getElementById("cabañaSeleccionada").innerText = nombres[chalet] || chalet;
     document.getElementById("total").innerText     = total.toFixed(2);
     document.getElementById("descuento").innerText = descuento.toFixed(2);
     document.getElementById("resto").innerText     = (total - 50).toFixed(2);
-
     spinner.style.display   = "none";
     resultado.style.display = "block";
   }, 300);
 }
 
 function esTemporadaAlta(fecha) {
-  const mes = fecha.getMonth() + 1;
-  const dia = fecha.getDate();
-  const dow = fecha.getDay();
-  return (mes===7 || mes===8 || (mes===12&&dia>=22) || (mes===1&&dia<=7) || dow===5 || dow===6);
+  const mes = fecha.getMonth()+1, dia = fecha.getDate(), dow = fecha.getDay();
+  return (mes===7||mes===8||(mes===12&&dia>=22)||(mes===1&&dia<=7)||dow===5||dow===6);
 }
 
 function reservar() { alert("Aquí se conectará el pago de 50 €."); }
@@ -352,13 +379,13 @@ function reservar() { alert("Aquí se conectará el pago de 50 €."); }
 function actualizarUrgencia(fechasOcupadas) {
   const mensaje = document.getElementById("mensajeUrgencia");
   if (!mensaje) return;
-  const mes = new Date().getMonth() + 1;
-  const ocupadas = (fechasOcupadas.rebeco?.length||0) + (fechasOcupadas.urogallo?.length||0) + (fechasOcupadas.armino?.length||0);
+  const mes = new Date().getMonth()+1;
+  const ocupadas = (fechasOcupadas.rebeco?.length||0)+(fechasOcupadas.urogallo?.length||0)+(fechasOcupadas.armino?.length||0);
   let texto = "";
-  if (mes===7||mes===8)   texto = "🔥 Verano es temporada alta. Te recomendamos reservar pronto.";
-  else if (ocupadas>20)   texto = "⚡ Quedan pocas fechas disponibles este mes.";
-  else if (ocupadas>10)   texto = "📅 Este alojamiento suele reservarse rápido.";
-  else                    texto = "✨ Reserva ahora para asegurar tus fechas.";
+  if (mes===7||mes===8)  texto = "🔥 Verano es temporada alta. Te recomendamos reservar pronto.";
+  else if (ocupadas>20)  texto = "⚡ Quedan pocas fechas disponibles este mes.";
+  else if (ocupadas>10)  texto = "📅 Este alojamiento suele reservarse rápido.";
+  else                   texto = "✨ Reserva ahora para asegurar tus fechas.";
   mensaje.innerText = texto;
 }
 
@@ -367,30 +394,24 @@ function actualizarUrgencia(fechasOcupadas) {
 // ================================
 function initCarousel(containerSelector, slideSelector, prevSelector, nextSelector, indicatorSelector) {
   document.querySelectorAll(containerSelector).forEach(container => {
-    const slides     = container.querySelectorAll(slideSelector);
-    const prevBtn    = container.querySelector(prevSelector);
-    const nextBtn    = container.querySelector(nextSelector);
-    const indicators = container.querySelectorAll(indicatorSelector);
-    let currentIndex = 0;
+    const slides=container.querySelectorAll(slideSelector), prevBtn=container.querySelector(prevSelector),
+          nextBtn=container.querySelector(nextSelector), indicators=container.querySelectorAll(indicatorSelector);
+    let currentIndex=0;
     if (!slides.length) return;
     function showSlide(index) {
-      slides.forEach((s,i)       => { s.style.display = i===index ? "block" : "none"; });
-      indicators.forEach((ind,i) => { ind.classList.toggle("active", i===index); });
+      slides.forEach((s,i)=>{s.style.display=i===index?"block":"none";});
+      indicators.forEach((ind,i)=>{ind.classList.toggle("active",i===index);});
     }
-    nextBtn?.addEventListener("click", () => { currentIndex=(currentIndex+1)%slides.length; showSlide(currentIndex); });
-    prevBtn?.addEventListener("click", () => { currentIndex=(currentIndex-1+slides.length)%slides.length; showSlide(currentIndex); });
-    indicators.forEach((ind,i) => { ind.addEventListener("click", () => { currentIndex=i; showSlide(currentIndex); }); });
+    nextBtn?.addEventListener("click",()=>{currentIndex=(currentIndex+1)%slides.length;showSlide(currentIndex);});
+    prevBtn?.addEventListener("click",()=>{currentIndex=(currentIndex-1+slides.length)%slides.length;showSlide(currentIndex);});
+    indicators.forEach((ind,i)=>{ind.addEventListener("click",()=>{currentIndex=i;showSlide(currentIndex);});});
     showSlide(currentIndex);
   });
 }
 
 function initHamburger() {
-  const hamburger = document.getElementById("hamburger");
-  const navMenu   = document.getElementById("navMenu");
-  hamburger?.addEventListener("click", () => {
-    navMenu?.classList.toggle("active");
-    hamburger.classList.toggle("active");
-  });
+  const hamburger=document.getElementById("hamburger"), navMenu=document.getElementById("navMenu");
+  hamburger?.addEventListener("click",()=>{navMenu?.classList.toggle("active");hamburger.classList.toggle("active");});
 }
 
 // ================================
@@ -398,8 +419,8 @@ function initHamburger() {
 // ================================
 document.addEventListener("DOMContentLoaded", async () => {
   initHamburger();
-  initCarousel(".carousel-container",         ".carousel-slide",         ".prev",         ".next",         ".indicator");
-  initCarousel(".carousel-container-general", ".carousel-slide-general", ".prev-general", ".next-general", ".indicator-general");
+  initCarousel(".carousel-container",".carousel-slide",".prev",".next",".indicator");
+  initCarousel(".carousel-container-general",".carousel-slide-general",".prev-general",".next-general",".indicator-general");
 
   await prepararFlatpickr();
   actualizarUrgencia(reservasGlobal);
@@ -410,23 +431,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.getElementById("adminButton")?.addEventListener("click", () => {
     if (adminActivo) {
-      adminActivo = false;
-      document.getElementById("adminButton").style.backgroundColor = "#444";
-      alert("Modo administrador desactivado");
-      return;
+      adminActivo=false;
+      document.getElementById("adminButton").style.backgroundColor="#444";
+      alert("Modo administrador desactivado"); return;
     }
-    const clave = prompt("Introduce la contraseña de administrador:");
-    if (clave === ADMIN_PASSWORD) {
-      adminActivo = true;
-      document.getElementById("adminButton").style.backgroundColor = "#2e5a6b";
+    const clave=prompt("Introduce la contraseña de administrador:");
+    if (clave===ADMIN_PASSWORD) {
+      adminActivo=true;
+      document.getElementById("adminButton").style.backgroundColor="#2e5a6b";
       alert("Modo administrador activado");
-    } else {
-      alert("Contraseña incorrecta");
-    }
+    } else { alert("Contraseña incorrecta"); }
   });
 
-  setInterval(async () => {
-    const reservas = await cargarReservasBackend();
+  setInterval(async()=>{
+    const reservas=await cargarReservasBackend();
     actualizarUrgencia(reservas);
   }, 2*60*60*1000);
 });
