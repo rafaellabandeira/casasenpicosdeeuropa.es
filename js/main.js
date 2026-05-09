@@ -13,7 +13,7 @@ function formatearLocal(fecha) { return fechaLocal(fecha); }
 const BIN_ID = "69eefe35aaba882197405520";
 const API_KEY = "$2a$10$OSt3X0LKRYNW/3u8GoYsguuf1knig5JSICRCwUusGqtyBvFsNvJ4W";
 const BACKEND_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
-const ADMIN_PASSWORD = "bores2024";
+const ADMIN_PASSWORD = "8111";
 
 async function cargarReservasBackend() {
   try {
