@@ -136,16 +136,7 @@ function inicializarFlatpickr() {
     locale: "es",
     dateFormat: "d-m-Y",
 
-    disable: [
-      date => {
-        const iso = fechaLocal(date);
-        const seleccionadas = flatpickrInstance?.selectedDates || [];
-        if (seleccionadas.length === 1) {
-          return esDiaIntermedio(iso);
-        }
-        return esBloqueada(iso) && !esPrimerDiaBloque(iso);
-      }
-    ],
+    disable: [],
 
     onDayCreate: function(dObj, dStr, fp, dayElem) {
       const fecha = new Date(dayElem.dateObj);
