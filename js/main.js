@@ -26,14 +26,14 @@ async function cargarReservasBackend() {
     return {
       rebeco:            data.rebeco?.map(f => f.slice(0, 10))            || [],
       urogallo:          data.urogallo?.map(f => f.slice(0, 10))          || [],
-      muflon:            data.muflon?.map(f => f.slice(0, 10))            || [],
+      armino:            data.armino?.map(f => f.slice(0, 10))            || [],
       bloqueos_rebeco:   data.bloqueados_rebeco                            || [],
       bloqueos_urogallo: data.bloqueados_urogallo                          || [],
-      bloqueos_muflon:   data.bloqueados_muflon                            || []
+      bloqueos_armino:   data.bloqueados_armino                            || []
     };
   } catch (err) {
     console.error(err);
-    return { rebeco: [], urogallo: [], muflon: [], bloqueos_rebeco: [], bloqueos_urogallo: [], bloqueos_muflon: [] };
+    return { rebeco: [], urogallo: [], armino: [], bloqueos_rebeco: [], bloqueos_urogallo: [], bloqueos_armino: [] };
   }
 }
 
@@ -239,10 +239,10 @@ async function prepararFlatpickr() {
   datosCompletos = {
     rebeco:             reservas.rebeco,
     urogallo:           reservas.urogallo,
-    muflon:             reservas.muflon,
+    armino:             reservas.armino,
     bloqueados_rebeco:   reservas.bloqueos_rebeco,
     bloqueados_urogallo: reservas.bloqueos_urogallo,
-    bloqueados_muflon:   reservas.bloqueos_muflon
+    bloqueados_armino:   reservas.bloqueos_armino
   };
 
   const chalet = document.getElementById("cabaña").value;
@@ -310,7 +310,7 @@ function calcularReserva() {
     else if (noches >= 3 && !esTemporadaAlta(inicio)) descuento = total * 0.10;
     total -= descuento;
 
-    const nombres = { rebeco: "Chalet El Rebeco", urogallo: "Chalet El Urogallo", muflon: "Chalet El Muflón" };
+    const nombres = { rebeco: "Chalet El Rebeco", urogallo: "Chalet El Urogallo", armino: "Chalet El Armiño" };
     document.getElementById("cabañaSeleccionada").innerText = nombres[chalet] || chalet;
     document.getElementById("total").innerText     = total.toFixed(2);
     document.getElementById("descuento").innerText = descuento.toFixed(2);
@@ -342,7 +342,7 @@ function actualizarUrgencia(fechasOcupadas) {
   const mensaje = document.getElementById("mensajeUrgencia");
   if (!mensaje) return;
   const mes = new Date().getMonth() + 1;
-  const ocupadas = (fechasOcupadas.rebeco?.length || 0) + (fechasOcupadas.urogallo?.length || 0) + (fechasOcupadas.muflon?.length || 0);
+  const ocupadas = (fechasOcupadas.rebeco?.length || 0) + (fechasOcupadas.urogallo?.length || 0) + (fechasOcupadas.armino?.length || 0);
   let texto = "";
   if (mes === 7 || mes === 8)  texto = "🔥 Verano es temporada alta. Te recomendamos reservar pronto.";
   else if (ocupadas > 20)      texto = "⚡ Quedan pocas fechas disponibles este mes.";
