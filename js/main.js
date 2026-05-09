@@ -140,7 +140,6 @@ function pintarRangoVisual() {
     }
   });
 }
-
 // ================================
 // FLATPICKR - modo range nativo
 // pero con navegación entre meses protegida
@@ -188,6 +187,7 @@ function inicializarFlatpickr() {
       const fecha = new Date(dayElem.dateObj);
       const clase = colorearDias(fecha);
       dayElem.classList.add(clase);
+      // Incluir días de meses adyacentes (nextMonthDay/prevMonthDay)
       asignarListenerDia(dayElem, fecha, clase);
     },
 
@@ -199,11 +199,16 @@ function inicializarFlatpickr() {
 }
 
 function asignarListenersDias() {
-  document.querySelectorAll(".flatpickr-day").forEach(dayElem => {
+  // Incluir también nextMonthDay y prevMonthDay para selección entre meses
+  document.querySelectorAll(".flatpickr-day, .flatpickr-day.nextMonthDay, .flatpickr-day.prevMonthDay").forEach(dayElem => {
     if (!dayElem.dateObj) return;
     const fecha = new Date(dayElem.dateObj);
-    // Resetear clases de color
+    // Resetear clases de color pero preservar next/prevMonthDay
+    const esNextMonth = dayElem.classList.contains("nextMonthDay");
+    const esPrevMonth = dayElem.classList.contains("prevMonthDay");
     dayElem.className = "flatpickr-day";
+    if (esNextMonth) dayElem.classList.add("nextMonthDay");
+    if (esPrevMonth) dayElem.classList.add("prevMonthDay");
     const clase = colorearDias(fecha);
     dayElem.classList.add(clase);
     asignarListenerDia(dayElem, fecha, clase);
@@ -215,6 +220,10 @@ function asignarListenerDia(dayElem, fecha, clase) {
   const hoy = new Date(); hoy.setHours(0,0,0,0);
 
   // Click normal: selección de rango
+  // Eliminar pointer-events none que Flatpickr pone en nextMonthDay
+  dayElem.style.pointerEvents = "auto";
+  dayElem.style.cursor = "pointer";
+
   dayElem.addEventListener("click", (e) => {
     if (adminActivo) return;
     if (fecha < hoy) return;
@@ -230,6 +239,14 @@ function asignarListenerDia(dayElem, fecha, clase) {
       dayElem.classList.add("startRange", "selected");
     } else {
       // Segundo click
+      // Si hace click en el mismo día de inicio → cancelar selección
+      if (fechaLocal(fecha) === fechaLocal(rangoInicio)) {
+        rangoInicio = null;
+        rangoFin = null;
+        limpiarSeleccionVisual();
+        document.getElementById("fechasSeleccionadas").textContent = "";
+        return;
+      }
       if (fecha <= rangoInicio) {
         // Reiniciar si click antes del inicio
         rangoInicio = new Date(fecha);
