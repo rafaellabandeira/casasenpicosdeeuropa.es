@@ -55,6 +55,7 @@ let flatpickrInstance;
 let arrastreActivo = false;
 let rangoSeleccionado = [];
 let adminActivo = false;
+let fechaInicioGuardada = null;
 let datosCompletos = {};
 
 // ================================
@@ -138,6 +139,15 @@ function inicializarFlatpickr() {
 
     disable: [],
 
+    onMonthChange: function(selectedDates, dateStr, instance) {
+      // Preservar fecha de inicio al navegar entre meses
+      if (fechaInicioGuardada) {
+        setTimeout(() => {
+          instance.setDate([fechaInicioGuardada], false);
+        }, 0);
+      }
+    },
+
     onDayCreate: function(dObj, dStr, fp, dayElem) {
       const fecha = new Date(dayElem.dateObj);
       const clase = colorearDias(fecha);
@@ -185,15 +195,17 @@ function inicializarFlatpickr() {
       });
     },
 
-    onMonthChange: function(selectedDates, dateStr, instance) {
-      // Si hay una fecha de inicio seleccionada, la preservamos al cambiar de mes
-      if (selectedDates.length === 1) {
-        instance.setDate(selectedDates[0], false);
-      }
-    },
-
     onChange: function(selectedDates) {
+      if (selectedDates.length === 1) {
+        fechaInicioGuardada = selectedDates[0];
+        return;
+      }
+      if (selectedDates.length === 0) {
+        fechaInicioGuardada = null;
+        return;
+      }
       if (selectedDates.length === 2) {
+        fechaInicioGuardada = null;
         const inicio = selectedDates[0];
         const fin = selectedDates[1];
         const isoInicio = fechaLocal(inicio);
