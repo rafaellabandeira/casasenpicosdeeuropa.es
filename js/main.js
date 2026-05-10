@@ -140,6 +140,7 @@ function pintarRangoVisual() {
     }
   });
 }
+
 // ================================
 // FLATPICKR - modo range nativo
 // pero con navegación entre meses protegida
@@ -232,25 +233,16 @@ function asignarListenerDia(dayElem, fecha, clase) {
     e.stopPropagation();
 
     if (!rangoInicio) {
-      // Primer click
+      // Click 1: seleccionar check-in
       rangoInicio = new Date(fecha);
       rangoFin = null;
       limpiarSeleccionVisual();
       dayElem.classList.add("startRange", "selected");
-    } else {
-      // Segundo click
-      // Si hace click en el mismo día de inicio → cancelar selección
-      if (fechaLocal(fecha) === fechaLocal(rangoInicio)) {
-        rangoInicio = null;
-        rangoFin = null;
-        limpiarSeleccionVisual();
-        document.getElementById("fechasSeleccionadas").textContent = "";
-        return;
-      }
+    } else if (!rangoFin) {
+      // Click 2: seleccionar check-out
       if (fecha <= rangoInicio) {
-        // Reiniciar si click antes del inicio
+        // Si click antes del inicio, el nuevo día pasa a ser el check-in
         rangoInicio = new Date(fecha);
-        rangoFin = null;
         limpiarSeleccionVisual();
         dayElem.classList.add("startRange", "selected");
         return;
@@ -266,6 +258,12 @@ function asignarListenerDia(dayElem, fecha, clase) {
       const opc = { year: "numeric", month: "long", day: "numeric" };
       document.getElementById("fechasSeleccionadas").textContent =
         `${rangoInicio.toLocaleDateString("es-ES", opc)} → ${rangoFin.toLocaleDateString("es-ES", opc)}`;
+    } else {
+      // Click 3: limpiar todo
+      rangoInicio = null;
+      rangoFin = null;
+      limpiarSeleccionVisual();
+      document.getElementById("fechasSeleccionadas").textContent = "";
     }
   });
 
