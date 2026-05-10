@@ -174,7 +174,7 @@ function inicializarFlatpickr() {
 
   flatpickrInstance = flatpickr("#calendarioVisible", {
     inline: true,
-    mode: "single",
+    mode: "range",
     locale: "es",
     dateFormat: "d-m-Y",
 
@@ -199,9 +199,10 @@ function inicializarFlatpickr() {
     const dayElem = e.target.closest(".flatpickr-day");
     if (dayElem) {
       e.stopPropagation();
+      e.preventDefault();
       manejarClickDia(dayElem);
     }
-  });
+  }, true); // useCapture=true para interceptar antes que Flatpickr
 }
 
 async function prepararFlatpickr() {
