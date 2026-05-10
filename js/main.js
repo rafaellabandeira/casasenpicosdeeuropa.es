@@ -114,6 +114,7 @@ function validarRango(inicio, fin) {
   }
   return true;
 }
+
 // ================================
 // PINTAR RANGO VISUAL
 // ================================
@@ -162,6 +163,66 @@ function inicializarFlatpickr() {
   rangoInicio = null;
   rangoFin = null;
 
+  // Listener delegado en el contenedor — funciona en cualquier mes sin reasignar
+  const contenedor = document.getElementById("calendarioVisible");
+  if (contenedor._clickHandler) contenedor.removeEventListener("click", contenedor._clickHandler);
+
+  contenedor._clickHandler = async function(e) {
+    const dayElem = e.target.closest(".flatpickr-day");
+    if (!dayElem || !dayElem.dateObj) return;
+
+    const fecha = new Date(dayElem.dateObj);
+    const hoy = new Date(); hoy.setHours(0,0,0,0);
+    const clase = [...dayElem.classList].find(c => c.startsWith("dia-")) || "";
+
+    if (adminActivo) {
+      if (fecha < hoy) return;
+      const fechaISO = fechaLocal(fecha);
+      const chalet = document.getElementById("cabaña").value;
+      if (bloqueosFlatpickr.includes(fechaISO)) {
+        bloqueosFlatpickr = bloqueosFlatpickr.filter(f => f !== fechaISO);
+      } else if (!fechasOcupadasFlatpickr.includes(fechaISO)) {
+        bloqueosFlatpickr.push(fechaISO);
+      }
+      datosCompletos[`bloqueados_${chalet}`] = bloqueosFlatpickr;
+      await guardarBloqueoEnBackend();
+      inicializarFlatpickr();
+      return;
+    }
+
+    if (fecha < hoy) return;
+    if (clase === "dia-bloqueado") return;
+
+    if (!rangoInicio) {
+      rangoInicio = new Date(fecha);
+      rangoFin = null;
+      pintarRangoVisual();
+      dayElem.classList.add("startRange", "selected");
+    } else if (!rangoFin) {
+      if (fecha <= rangoInicio) {
+        rangoInicio = new Date(fecha);
+        limpiarSeleccionVisual();
+        dayElem.classList.add("startRange", "selected");
+        return;
+      }
+      if (!validarRango(rangoInicio, fecha)) {
+        rangoInicio = null; rangoFin = null;
+        limpiarSeleccionVisual();
+        return;
+      }
+      rangoFin = new Date(fecha);
+      pintarRangoVisual();
+      const opc = { year: "numeric", month: "long", day: "numeric" };
+      document.getElementById("fechasSeleccionadas").textContent =
+        `${rangoInicio.toLocaleDateString("es-ES", opc)} → ${rangoFin.toLocaleDateString("es-ES", opc)}`;
+    } else {
+      rangoInicio = null; rangoFin = null;
+      limpiarSeleccionVisual();
+      document.getElementById("fechasSeleccionadas").textContent = "";
+    }
+  };
+  contenedor.addEventListener("click", contenedor._clickHandler);
+
   flatpickrInstance = flatpickr("#calendarioVisible", {
     inline: true,
     mode: "range",
@@ -194,7 +255,7 @@ function inicializarFlatpickr() {
   });
 }
 
-function asignarListenersDias() {
+function asignarListenersDias_UNUSED() {
   // Incluir también nextMonthDay y prevMonthDay para selección entre meses
   document.querySelectorAll(".flatpickr-day, .flatpickr-day.nextMonthDay, .flatpickr-day.prevMonthDay").forEach(dayElem => {
     if (!dayElem.dateObj) return;
@@ -212,7 +273,7 @@ function asignarListenersDias() {
   pintarRangoVisual();
 }
 
-function asignarListenerDia(dayElem, fecha, clase) {
+function asignarListenerDia_UNUSED(dayElem, fecha, clase) {
   const hoy = new Date(); hoy.setHours(0,0,0,0);
 
   // Eliminar pointer-events none que Flatpickr pone en nextMonthDay
@@ -238,8 +299,7 @@ function asignarListenerDia(dayElem, fecha, clase) {
       inicializarFlatpickr();
       return;
     }
-
-    // MODO USUARIO: selección de rango en 3 clicks
+        // MODO USUARIO: selección de rango en 3 clicks
     if (fecha < hoy) return;
     if (clase === "dia-bloqueado") return;
 
