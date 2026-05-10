@@ -141,7 +141,6 @@ function pintarRangoVisual() {
     }
   });
 }
-
 // ================================
 // FLATPICKR - modo range nativo
 // pero con navegación entre meses protegida
@@ -170,19 +169,23 @@ function inicializarFlatpickr() {
     dateFormat: "d-m-Y",
 
     onReady: function() {
-      // Interceptar botones de navegación para preservar rangoInicio
       const cal = document.querySelector(".flatpickr-calendar");
       if (!cal) return;
       cal.querySelectorAll(".flatpickr-prev-month, .flatpickr-next-month").forEach(btn => {
         btn.addEventListener("click", () => {
-          // Tras el cambio de mes, repintar el rango guardado
           setTimeout(() => {
             pintarRangoVisual();
-            // Reasignar listeners a los nuevos días
             asignarListenersDias();
           }, 50);
         });
       });
+    },
+
+    onMonthChange: function() {
+      setTimeout(() => {
+        pintarRangoVisual();
+        asignarListenersDias();
+      }, 50);
     },
 
     onDayCreate: function(dObj, dStr, fp, dayElem) {
@@ -322,6 +325,7 @@ async function guardarBloqueoEnBackend() {
   datosCompletos[`bloqueados_${chalet}`] = bloqueosFlatpickr;
   await guardarDatosBackend(datosCompletos);
 }
+
 // ================================
 // CÁLCULO DE RESERVA
 // ================================
