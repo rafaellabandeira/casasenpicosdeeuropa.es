@@ -114,7 +114,6 @@ function validarRango(inicio, fin) {
   }
   return true;
 }
-
 // ================================
 // PINTAR RANGO VISUAL
 // ================================
@@ -141,6 +140,7 @@ function pintarRangoVisual() {
     }
   });
 }
+
 // ================================
 // FLATPICKR - modo range nativo
 // pero con navegación entre meses protegida
@@ -169,23 +169,14 @@ function inicializarFlatpickr() {
     dateFormat: "d-m-Y",
 
     onReady: function() {
+      // MutationObserver: detecta cuando Flatpickr redibuja los días al cambiar de mes
       const cal = document.querySelector(".flatpickr-calendar");
       if (!cal) return;
-      cal.querySelectorAll(".flatpickr-prev-month, .flatpickr-next-month").forEach(btn => {
-        btn.addEventListener("click", () => {
-          setTimeout(() => {
-            pintarRangoVisual();
-            asignarListenersDias();
-          }, 50);
-        });
-      });
-    },
-
-    onMonthChange: function() {
-      setTimeout(() => {
+      const observer = new MutationObserver(() => {
         pintarRangoVisual();
         asignarListenersDias();
-      }, 50);
+      });
+      observer.observe(cal, { childList: true, subtree: true });
     },
 
     onDayCreate: function(dObj, dStr, fp, dayElem) {
