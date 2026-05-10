@@ -189,7 +189,7 @@ function inicializarFlatpickr() {
     },
 
     onChange: function() {
-      flatpickrInstance.clear();
+      // No hacer nada — el rango se gestiona manualmente
     }
   });
 
