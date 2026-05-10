@@ -54,6 +54,7 @@ let datosCompletos = {};
 let rangoInicio = null;
 let rangoFin = null;
 
+
 // ================================
 // HELPERS DE FECHAS
 // ================================
@@ -220,28 +221,43 @@ function asignarListenersDias() {
 function asignarListenerDia(dayElem, fecha, clase) {
   const hoy = new Date(); hoy.setHours(0,0,0,0);
 
-  // Click normal: selección de rango
   // Eliminar pointer-events none que Flatpickr pone en nextMonthDay
   dayElem.style.pointerEvents = "auto";
   dayElem.style.cursor = "pointer";
 
-  dayElem.addEventListener("click", (e) => {
-    if (adminActivo) return;
+  // Click: modo usuario → selección de rango / modo admin → bloquear/desbloquear
+  dayElem.addEventListener("click", async (e) => {
+    e.stopPropagation();
+
+    if (adminActivo) {
+      // MODO ADMIN: un click bloquea o desbloquea
+      if (fecha < hoy) return;
+      const fechaISO = fechaLocal(fecha);
+      const chalet = document.getElementById("cabaña").value;
+      if (bloqueosFlatpickr.includes(fechaISO)) {
+        bloqueosFlatpickr = bloqueosFlatpickr.filter(f => f !== fechaISO);
+      } else if (!fechasOcupadasFlatpickr.includes(fechaISO)) {
+        bloqueosFlatpickr.push(fechaISO);
+      }
+      datosCompletos[`bloqueados_${chalet}`] = bloqueosFlatpickr;
+      await guardarBloqueoEnBackend();
+      inicializarFlatpickr();
+      return;
+    }
+
+    // MODO USUARIO: selección de rango en 3 clicks
     if (fecha < hoy) return;
     if (clase === "dia-bloqueado") return;
 
-    e.stopPropagation();
-
     if (!rangoInicio) {
-      // Click 1: seleccionar check-in
+      // Click 1: check-in
       rangoInicio = new Date(fecha);
       rangoFin = null;
       limpiarSeleccionVisual();
       dayElem.classList.add("startRange", "selected");
     } else if (!rangoFin) {
-      // Click 2: seleccionar check-out
+      // Click 2: check-out
       if (fecha <= rangoInicio) {
-        // Si click antes del inicio, el nuevo día pasa a ser el check-in
         rangoInicio = new Date(fecha);
         limpiarSeleccionVisual();
         dayElem.classList.add("startRange", "selected");
@@ -265,22 +281,6 @@ function asignarListenerDia(dayElem, fecha, clase) {
       limpiarSeleccionVisual();
       document.getElementById("fechasSeleccionadas").textContent = "";
     }
-  });
-
-  // Doble click admin: bloquear/desbloquear
-  dayElem.addEventListener("dblclick", async () => {
-    if (!adminActivo) return;
-    if (fecha < hoy) return;
-    const fechaISO = fechaLocal(fecha);
-    const chalet = document.getElementById("cabaña").value;
-    if (bloqueosFlatpickr.includes(fechaISO)) {
-      bloqueosFlatpickr = bloqueosFlatpickr.filter(f => f !== fechaISO);
-    } else if (!fechasOcupadasFlatpickr.includes(fechaISO)) {
-      bloqueosFlatpickr.push(fechaISO);
-    }
-    datosCompletos[`bloqueados_${chalet}`] = bloqueosFlatpickr;
-    await guardarBloqueoEnBackend();
-    inicializarFlatpickr();
   });
 
   // Mousedown/enter: arrastre admin
@@ -322,7 +322,6 @@ async function guardarBloqueoEnBackend() {
   datosCompletos[`bloqueados_${chalet}`] = bloqueosFlatpickr;
   await guardarDatosBackend(datosCompletos);
 }
-
 // ================================
 // CÁLCULO DE RESERVA
 // ================================
