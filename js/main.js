@@ -174,7 +174,7 @@ function inicializarFlatpickr() {
 
   flatpickrInstance = flatpickr("#calendarioVisible", {
     inline: true,
-    mode: "range",
+    mode: "single",
     locale: "es",
     dateFormat: "d-m-Y",
 
