@@ -1,1 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
 
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chalet El Armiño | Casas en Picos de Europa · Bores, Valle de Liébana</title>
+
+<meta name="description" content="Chalet El Armiño en Bores, Valle de Liébana, Picos de Europa, Cantabria. Casa rural para 5 personas con 2 habitaciones.">
+<meta name="keywords" content="chalet el armiño, bores, valle liebana, picos de europa, potes, alojamiento rural cantabria">
+
+<link rel="canonical" href="https://casasenpicosdeeuropa.es/chalet-el-armino.html">
+<link rel="icon" href="images/faviconsvg.jpg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="images/faviconsvg.jpg">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/global.css">
+<link rel="stylesheet" href="css/cabanas.css">
+<link rel="stylesheet" href="css/index.css">
+<link rel="stylesheet" href="css/style.css">
+
+<style>
+
+body { font-family: 'DM Sans', sans-serif !important; }
+
+:root {
+  --blue-deep: #1a2f3d; --blue-mid: #2e5a6b;
+  --blue-light: #d4eaf0; --muted-blue: #6b7a7f;
+}
+
+.navbar {
+  background: #1a2f3d !important;
+  padding: 0 16px !important;
+  height: 64px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  box-shadow: none !important;
+}
+
+.nav-logo {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  text-decoration: none !important;
+  font-size: unset !important;
+  color: unset !important;
+  text-shadow: none !important;
+}
+
+.nav-logo::before { content: none !important; }
+
+.nav-logo-icon {
+  width: 38px; height: 38px;
+  background: #2e5a6b;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 19px; flex-shrink: 0;
+}
+
+.nav-logo-text { display: flex; flex-direction: column; line-height: 1.15; }
+
+.nav-logo-text span:first-child {
+  font-size: 15px; font-weight: 600; color: #fff; letter-spacing: 0.01em;
+}
+
+.nav-logo-text span:last-child {
+  font-size: 11px; color: #7dd3c8; font-weight: 300;
+  letter-spacing: 0.07em; text-transform: uppercase;
+}
+
+.hamburger span { background: #fff !important; }
+.nav-menu { list-style: none !important; }
+.nav-menu li { list-style: none !important; }
+
+.nav-pills {
+  background: #fff;
+  border-bottom: 1px solid #e8e1d4;
+  display: flex; gap: 8px;
+  padding: 10px 16px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.nav-pills::-webkit-scrollbar { display: none; }
+
+.pill {
+  white-space: nowrap; padding: 7px 16px;
+  border-radius: 20px; font-size: 12px; font-weight: 500;
+  border: 1.5px solid #e8e1d4; color: #6b7a7f;
+  background: #fff; cursor: pointer; flex-shrink: 0;
+  text-decoration: none; display: inline-block;
+}
+
+.pill.active, .pill:hover {
+  background: #2e5a6b; border-color: #2e5a6b; color: #fff;
+}
+
+.hero {
+  position: relative !important;
+  height: 55vh !important;
+  min-height: unset !important;
+  background-image: url('images/1000192177.jpg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  display: block !important;
+  overflow: hidden !important;
+}
+
+.hero::before {
+  content: '' !important;
+  position: absolute !important; inset: 0 !important;
+  background: linear-gradient(to bottom,
+    rgba(10,20,30,.15) 0%,
+    rgba(10,20,30,.0) 15%,
+    rgba(10,20,30,.55) 55%,
+    rgba(10,20,30,.9) 100%
+  ) !important;
+  z-index: 1 !important;
+}
+
+.header-inner { display: none !important; }
+
+.hero-content {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-70%);
+  left: 0; right: 0;
+  z-index: 2;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(255,255,255,.15);
+  border: 1.5px solid rgba(255,255,255,.5);
+  border-radius: 24px; padding: 7px 16px;
+  font-size: 13px; font-weight: 600; color: #fff;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 14px; backdrop-filter: blur(6px);
+}
+
+.hero-badge::before {
+  content: ''; width: 7px; height: 7px;
+  background: #7dd3c8; border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .4; transform: scale(1.5); }
+}
+
+.hero-content h1 {
+  font-family: 'Fraunces', serif !important;
+  font-size: 40px !important; color: #fff !important;
+  line-height: 1.05 !important; margin-bottom: 14px !important;
+  text-shadow: 0 2px 20px rgba(0,0,0,.4) !important;
+}
+
+.hero-content h1 em {
+  font-style: italic; color: #7dd3c8;
+  display: block; font-size: 46px;
+}
+
+.hero-content .hero-sub {
+  font-size: 15px !important;
+  color: rgba(255,255,255,.88) !important;
+  font-weight: 300 !important; line-height: 1.6 !important;
+  text-shadow: 0 1px 8px rgba(0,0,0,.5) !important;
+  max-width: 360px !important;
+  margin: 0 auto !important;
+}
+
+.section-label {
+  font-size: 10px; font-weight: 600; color: #2e5a6b;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+}
+
+.section-label::after { content: ''; flex: 1; height: 1px; background: #c8dde4; }
+
+section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 20px 24px;
+  border-bottom: 1px solid #e8e1d4;
+}
+
+section h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 26px; color: #1a2f3d; line-height: 1.2; margin-bottom: 12px;
+}
+
+section > p {
+  font-size: 14px; color: #6b7a7f; line-height: 1.7;
+  font-weight: 300; margin-bottom: 12px;
+}
+
+.features-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+
+.feat-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: #d4eaf0; color: #1a2f3d;
+  border-radius: 10px; padding: 8px 13px;
+  font-size: 12.5px; font-weight: 500;
+}
+
+.carousel-container { border-radius: 16px; overflow: hidden; }
+.carousel-slide img { width: 100%; border-radius: 16px; }
+
+.cta-box {
+  background: #1a2f3d; border-radius: 16px; padding: 20px; margin-top: 16px; text-align: center;
+}
+.cta-box p { color: #a8c9d8; font-size: 14px; line-height: 1.6; margin-bottom: 16px; }
+.cta-box a.whatsapp-link {
+  display: inline-flex; align-items: center; gap: 8px; background: #25D366;
+  color: #fff; text-decoration: none; border-radius: 12px; padding: 13px 22px;
+  font-size: 14px; font-weight: 500;
+}
+
+.volver-link {
+  display: inline-block; margin-top: 8px; color: #2e5a6b; font-size: 13.5px;
+  text-decoration: none; font-weight: 500;
+}
+
+iframe { border-radius: 12px; margin-top: 10px; }
+
+footer { text-align: center; padding: 24px 20px; font-size: 12.5px; color: #6b7a7f; }
+footer a { color: #2e5a6b; text-decoration: none; }
+
+#whatsappButton {
+  position: fixed; bottom: 20px; right: 20px;
+  width: 60px; height: 60px; z-index: 1000; border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3); background-color: #25D366;
+  display: flex; justify-content: center; align-items: center;
+}
+#whatsappButton img { width: 35px; height: 35px; }
+
+</style>
+</head>
+
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon">🏔️</div>
+      <div class="nav-logo-text">
+        <span>Casas en Picos de Europa</span>
+        <span>Valle de Liébana · Bores</span>
+      </div>
+    </a>
+    <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+  </div>
+</nav>
+
+<!-- ===== NAV PILLS ===== -->
+<div class="nav-pills">
+  <a class="pill" href="index.html#reserva-online">Reservar</a>
+  <a class="pill active" href="#descripcion">Este Chalet</a>
+  <a class="pill" href="index.html#chalets">Los 3 Chalets</a>
+  <a class="pill" href="#contacto">Contacto</a>
+</div>
+
+<!-- ===== HERO ===== -->
+<header class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">🦔 El Armiño</div>
+    <h1>Chalet<br><em>El Armiño</em></h1>
+    <p class="hero-sub">Casa rural para 5 personas en Bores, Valle de Liébana, a un paso de Potes y los Picos de Europa</p>
+  </div>
+</header>
+
+<!-- ===== DESCRIPCIÓN ===== -->
+<section id="descripcion">
+  <div class="section-label">Descripción</div>
+  <h2>Naturaleza y calma en los <em>Picos de Europa</em></h2>
+  <p>
+    Chalet con capacidad para 5 personas. Dispone de 2 habitaciones — una con cama
+    de matrimonio y otra con dos camas — además de un sofá cama en el salón y estufa
+    de pellets, con baño completo en la planta de arriba y aseo en la planta de abajo,
+    ofreciendo un espacio cómodo y funcional ideal para familias que buscan naturaleza
+    y tranquilidad en los Picos de Europa.
+  </p>
+  <p>
+    Situado en Bores, en la misma urbanización que los chalets El Rebeco y
+    El Urogallo, en pleno Valle de Liébana, Picos de Europa, Cantabria, a pocos
+    minutos de Potes y de la Ruta del Cares, en un entorno tranquilo y natural
+    ideal para desconectar.
+  </p>
+  <div class="features-row">
+    <div class="feat-pill">👨‍👩‍👧 5 personas</div>
+    <div class="feat-pill">🛏 2 habitaciones</div>
+    <div class="feat-pill">🛋️ Sofá cama</div>
+    <div class="feat-pill">🔥 Estufa de pellets</div>
+    <div class="feat-pill">🚿 Baño completo (arriba)</div>
+    <div class="feat-pill">🚻 Aseo (planta baja)</div>
+    <div class="feat-pill">📶 WIFI</div>
+    <div class="feat-pill">🏔️ Picos de Europa</div>
+    <div class="feat-pill">🌿 Valle de Liébana</div>
+  </div>
+</section>
+
+<!-- ===== DISPONIBILIDAD ===== -->
+<section id="disponibilidad">
+  <div class="section-label">Disponibilidad</div>
+  <h2>Consulta el calendario</h2>
+  <p>Para ver fechas libres y reservar, utiliza el motor de reservas en la página principal.</p>
+  <a class="pill" href="index.html#reserva-online" style="display:inline-block;">Ir a Reserva Online →</a>
+</section>
+
+<!-- ===== GALERÍA ===== -->
+<section>
+  <div class="section-label">Galería</div>
+  <h2>Fotos del Chalet</h2>
+  <div class="carousel-container">
+    <div class="carousel">
+      <div class="carousel-slide active">
+        <img src="images/1000192177.jpg" alt="Exterior Chalet El Armiño">
+      </div>
+      <div class="carousel-slide">
+        <img src="images/armino-2.jpg" alt="Interior Chalet El Armiño">
+      </div>
+      <div class="carousel-slide">
+        <img src="images/armino-3.jpg" alt="Habitación Chalet El Armiño">
+      </div>
+    </div>
+    <button class="carousel-button prev">❮</button>
+    <button class="carousel-button next">❯</button>
+    <div class="carousel-indicators">
+      <div class="indicator active"></div>
+      <div class="indicator"></div>
+      <div class="indicator"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== UBICACIÓN ===== -->
+<section>
+  <div class="section-label">Ubicación</div>
+  <h2>📍 Bores, Valle de Liébana</h2>
+  <p>Chalet "El Armiño" — Bores, Vega de Liébana, Picos de Europa, Cantabria.</p>
+  <iframe
+    src="https://www.google.com/maps?q=Bores,+Cantabria,+España&z=15&output=embed"
+    width="100%" height="350" style="border:0;" allowfullscreen="" loading="lazy">
+  </iframe>
+</section>
+
+<!-- ===== CONTACTO ===== -->
+<section id="contacto">
+  <div class="section-label">Reservas</div>
+  <h2>Reservas personalizadas</h2>
+  <div class="cta-box">
+    <p>Las reservas se gestionan directamente por WhatsApp para una atención personalizada y sin intermediarios.</p>
+    <a href="https://wa.me/34620419157" class="whatsapp-link">📱 WhatsApp 620 419 157</a>
+  </div>
+  <a class="volver-link" href="index.html">⬅ Volver a la página principal</a>
+</section>
+
+<footer>
+  <p><a href="aviso-legal.html">Aviso Legal</a> | <a href="privacidad.html">Política de Privacidad</a> | <a href="cookies.html">Política de Cookies</a></p>
+  <p>© casasenpicosdeeuropa.es · Valle de Liébana · Picos de Europa</p>
+</footer>
+
+<a href="https://wa.me/34620419157" target="_blank" id="whatsappButton" title="Chatea con nosotros">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" />
+</a>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
