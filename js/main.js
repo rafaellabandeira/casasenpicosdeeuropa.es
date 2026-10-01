@@ -24,7 +24,7 @@ function borrarClaveGuardada() {
 }
 const BIN_ID = "69eefe35aaba882197405520";
 const BACKEND_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
-const READ_KEY = "$2a$10$brpm3H8IQxDujgJ5/A7K..TcT51PV2i9o1M6nKwATNqQzQcWoxYze";
+const READ_KEY = "$2a$10$yTI7T9DU2v5K1mOvm8EeLen5plPKiEZeVbXMPCOHXZldLXC1jxb.e";
 let adminKey = null;
 
 async function cargarReservasBackend() {
