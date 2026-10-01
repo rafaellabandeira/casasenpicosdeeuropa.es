@@ -7,14 +7,29 @@ function fechaLocal(date) {
   return `${y}-${m}-${d}`;
 }
 
+// ---------- BACKEND (JSONBin) ----------
+// La lectura usa una Access Key de SOLO LECTURA (no permite modificar nada).
+// La escritura (modo administrador) usa la Master Key, que se pide por pantalla
+// y se recuerda en ESTE dispositivo (localStorage) para no tener que escribirla cada vez.
+// Úsalo solo en tu móvil u ordenador personal.
+const CLAVE_STORAGE = "chalets_admin_key";
+function leerClaveGuardada() {
+  try { return localStorage.getItem(CLAVE_STORAGE); } catch(e) { return null; }
+}
+function guardarClave(clave) {
+  try { localStorage.setItem(CLAVE_STORAGE, clave); } catch(e) {}
+}
+function borrarClaveGuardada() {
+  try { localStorage.removeItem(CLAVE_STORAGE); } catch(e) {}
+}
 const BIN_ID = "69eefe35aaba882197405520";
-const API_KEY = "$2a$10$OSt3X0LKRYNW/3u8GoYsguuf1knig5JSICRCwUusGqtyBvFsNvJ4W";
 const BACKEND_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
-const ADMIN_PASSWORD = "8111";
+const READ_KEY = "$2a$10$brpm3H8IQxDujgJ5/A7K..TcT51PV2i9o1M6nKwATNqQzQcWoxYze";
+let adminKey = null;
 
 async function cargarReservasBackend() {
   try {
-    const res = await fetch(BACKEND_URL + "/latest", { headers: { "X-Master-Key": API_KEY } });
+    const res = await fetch(BACKEND_URL + "/latest", { headers: { "X-Access-Key": READ_KEY } });
     if (!res.ok) throw new Error("Error");
     const data = (await res.json()).record;
     return {
@@ -32,13 +47,21 @@ async function cargarReservasBackend() {
 }
 
 async function guardarDatosBackend(datos) {
+  if (!adminKey) return;
   try {
     await fetch(BACKEND_URL, {
       method: "PUT",
-      headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
+      headers: { "Content-Type": "application/json", "X-Master-Key": adminKey },
       body: JSON.stringify(datos)
     });
   } catch(err) { console.error(err); }
+}
+
+async function validarClaveAdmin(clave) {
+  try {
+    const res = await fetch(BACKEND_URL + "/latest", { headers: { "X-Master-Key": clave } });
+    return res.ok;
+  } catch(err) { return false; }
 }
 
 let reservasGlobal = {};
@@ -228,6 +251,26 @@ async function guardarBloqueoEnBackend() {
   await guardarDatosBackend(datosCompletos);
 }
 
+// ---------- TEMPORADAS Y MÍNIMO DE NOCHES ----------
+function esTemporadaAlta(fecha) {
+  const mes = fecha.getMonth()+1, dia = fecha.getDate(), dow = fecha.getDay();
+  return (mes===7||mes===8||(mes===12&&dia>=22)||(mes===1&&dia<=7)||dow===5||dow===6);
+}
+
+// Mínimo de noches según la fecha de entrada:
+// - Julio, agosto y Navidad (22/12 - 7/01): 4 noches
+// - Entrada en viernes (viernes + sábado), fuera de esas fechas: 2 noches
+// - Entrada en sábado: 4 noches
+// - Resto: 2 noches
+function minimoNoches(inicio) {
+  const mes = inicio.getMonth() + 1, dia = inicio.getDate();
+  const verano = (mes === 7 || mes === 8);
+  const navidad = (mes === 12 && dia >= 22) || (mes === 1 && dia <= 7);
+  if (verano || navidad) return 4;
+  if (inicio.getDay() === 5) return 2;
+  return esTemporadaAlta(inicio) ? 4 : 2;
+}
+
 function calcularReserva() {
   const chalet = document.getElementById("cabaña").value;
   if (!rangoInicio || !rangoFin) {
@@ -255,7 +298,7 @@ function calcularReserva() {
     document.getElementById("fechasSeleccionadas").innerHTML =
       `📅 ${inicio.toLocaleDateString("es-ES", opc)} - ${fin.toLocaleDateString("es-ES", opc)}<br>🛏 ${noches} ${noches===1?"noche":"noches"}`;
 
-    const minNoches = esTemporadaAlta(inicio) ? 4 : 2;
+    const minNoches = minimoNoches(inicio);
     if (noches < minNoches) {
       alert(`Mínimo ${minNoches} noches en estas fechas`);
       spinner.style.display = "none"; return;
@@ -280,11 +323,6 @@ function calcularReserva() {
     spinner.style.display = "none";
     resultado.style.display = "block";
   }, 300);
-}
-
-function esTemporadaAlta(fecha) {
-  const mes = fecha.getMonth()+1, dia = fecha.getDate(), dow = fecha.getDay();
-  return (mes===7||mes===8||(mes===12&&dia>=22)||(mes===1&&dia<=7)||dow===5||dow===6);
 }
 
 function reservar() { alert("Aquí se conectará el pago de 50 €."); }
@@ -342,18 +380,40 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("btnPagar")?.addEventListener("click", reservar);
   document.getElementById("cabaña")?.addEventListener("change", prepararFlatpickr);
 
-  document.getElementById("adminButton")?.addEventListener("click", () => {
+  document.getElementById("adminButton")?.addEventListener("click", async () => {
+    const boton = document.getElementById("adminButton");
+
     if (adminActivo) {
       adminActivo = false;
-      document.getElementById("adminButton").style.backgroundColor = "#444";
-      alert("Modo administrador desactivado"); return;
+      adminKey = null;
+      boton.style.backgroundColor = "#444";
+      if (confirm("Modo administrador desactivado.\n\n¿Quieres también borrar la clave guardada en este dispositivo?")) {
+        borrarClaveGuardada();
+      }
+      return;
     }
-    const clave = prompt("Introduce la contraseña de administrador:");
-    if (clave === ADMIN_PASSWORD) {
+
+    // 1) Intentar con la clave guardada en este dispositivo
+    const guardada = leerClaveGuardada();
+    if (guardada && await validarClaveAdmin(guardada)) {
+      adminKey = guardada;
       adminActivo = true;
-      document.getElementById("adminButton").style.backgroundColor = "#2e5a6b";
+      boton.style.backgroundColor = "#2e5a6b";
       alert("Modo administrador activado");
-    } else { alert("Contraseña incorrecta"); }
+      return;
+    }
+    if (guardada) borrarClaveGuardada(); // la guardada ya no vale (p. ej. regenerada)
+
+    // 2) Pedirla
+    const clave = prompt("Introduce la clave de administrador (Master Key de JSONBin):");
+    if (!clave) return;
+    if (await validarClaveAdmin(clave.trim())) {
+      adminKey = clave.trim();
+      guardarClave(adminKey);
+      adminActivo = true;
+      boton.style.backgroundColor = "#2e5a6b";
+      alert("Modo administrador activado");
+    } else { alert("Clave incorrecta"); }
   });
 
   setInterval(async()=>{
