@@ -271,6 +271,7 @@ function minimoNoches(inicio) {
   return esTemporadaAlta(inicio) ? 4 : 2;
 }
 
+// PASO 1: calcula el precio (ya NO pide nombre, teléfono ni email)
 function calcularReserva() {
   const chalet = document.getElementById("cabaña").value;
   if (!rangoInicio || !rangoFin) {
@@ -278,15 +279,6 @@ function calcularReserva() {
   }
   const inicio = rangoInicio, fin = rangoFin;
   const noches = Math.round((fin - inicio) / (1000*60*60*24));
-  const nombre = document.getElementById("nombre").value.trim();
-  const telefono = document.getElementById("telefono").value.trim();
-  const email = document.getElementById("email").value.trim();
-
-  if (!nombre || !telefono || !email) {
-    if (!/\S+@\S+\.\S+/.test(email)) alert("Introduce un email válido.");
-    else alert("Completa todos los datos personales");
-    return;
-  }
 
   const spinner = document.getElementById("spinner");
   const resultado = document.getElementById("resultado");
@@ -325,7 +317,27 @@ function calcularReserva() {
   }, 300);
 }
 
-function reservar() { alert("Aquí se conectará el pago de 50 €."); }
+// PASO 2: aquí se validan los datos personales antes de pagar
+function reservar() {
+  const campoNombre = document.getElementById("nombre");
+  const campoTelefono = document.getElementById("telefono");
+  const campoEmail = document.getElementById("email");
+
+  if (!campoNombre.value.trim()) {
+    alert("Introduce tu nombre completo.");
+    campoNombre.focus(); return;
+  }
+  if (!campoTelefono.value.trim()) {
+    alert("Introduce tu teléfono.");
+    campoTelefono.focus(); return;
+  }
+  if (!/\S+@\S+\.\S+/.test(campoEmail.value.trim())) {
+    alert("Introduce un email válido.");
+    campoEmail.focus(); return;
+  }
+
+  alert("Aquí se conectará el pago de 50 €.");
+}
 
 function actualizarUrgencia(fechasOcupadas) {
   const mensaje = document.getElementById("mensajeUrgencia");
