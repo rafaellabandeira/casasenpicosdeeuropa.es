@@ -32,6 +32,32 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 body
   { font-family: 'DM Sans', sans-serif !important; }
 
+/* ===== CABECERA FIJA (siempre visible al hacer scroll) ===== */
+html { scroll-behavior: smooth; }
+
+.navbar {
+  position: -webkit-sticky !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1000 !important;
+}
+
+.nav-pills {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 64px; /* misma altura que la navbar */
+  z-index: 999;
+}
+
+/* Al pulsar un enlace, la sección no queda tapada por la cabecera */
+#reserva-online,
+#chalets,
+#contacto,
+#resultado,
+#pasoDatos {
+  scroll-margin-top: 130px;
+}
+
 .navbar {
   background: #1a2f3d !important;
   padding: 0 16px !important;
@@ -338,7 +364,7 @@ body
   position: fixed; bottom: 20px; left: 20px;
   width: 50px; height: 50px; z-index: 1000; border-radius: 50%;
   box-shadow: 0 2px 8px rgba(0,0,0,0.3); background-color: #444;
-  color: #fff; font-size: 24px; display: flex;
+  color: #fff; font-size: 24px; display: none;
   justify-content: center; align-items: center; cursor: pointer;
 }
 
@@ -444,6 +470,92 @@ body
   border-radius: 4px;
   flex-shrink: 0;
 }
+
+/* ===== AVISO 50 € Y BOTÓN CALCULAR DESTACADO ===== */
+.aviso-50 {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: #e6f6f3;
+  border: 2px solid #2e5a6b;
+  border-radius: 10px;
+  text-align: center;
+  color: #1a2f3d;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.aviso-50 strong { font-size: 17px; }
+
+.reserva-box #btnCalcular {
+  margin-top: 12px;
+  padding: 16px 12px;
+  background: #f57c00;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(245, 124, 0, 0.45);
+}
+
+.reserva-box #btnCalcular:hover,
+.reserva-box #btnCalcular:active {
+  background: #e65100;
+}
+
+/* ===== RESERVA EN DOS PASOS ===== */
+.reserva-box #btnContinuar,
+.reserva-box #btnPagar {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  padding: 16px 12px;
+  background: #2e7d32;
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 700;
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(46, 125, 50, 0.4);
+}
+
+.reserva-box #btnContinuar:hover,
+.reserva-box #btnContinuar:active,
+.reserva-box #btnPagar:hover,
+.reserva-box #btnPagar:active {
+  background: #1b5e20;
+}
+
+/* ===== BOTÓN "RESERVAR ESTE CHALET" EN LAS TARJETAS ===== */
+.cabin-reservar {
+  display: block;
+  text-align: center;
+  margin-top: 10px;
+  background: #f57c00;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 12px;
+  padding: 13px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cabin-reservar:hover { background: #e65100; }
+
+/* ===== CANDADO ADMIN: oculto salvo en tu dispositivo ===== */
+#adminButton.visible { display: flex; }
+
+#pasoDatos {
+  display: none;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #e0e0e0;
+}
+
+#pasoDatos h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  color: #1a2f3d;
+  margin: 0 0 8px;
+}
 </style>
 
 </head>
@@ -535,6 +647,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <span class="cabin-feat">🏔️ Picos de Europa</span>
         </div>
         <a class="cabin-cta" href="chalet-el-rebeco.html">Ver Chalet El Rebeco</a>
+        <a class="cabin-reservar" href="#reserva-online" data-chalet="rebeco">Reservar este chalet</a>
       </div>
     </div>
 
@@ -554,6 +667,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <span class="cabin-feat">🌿 Valle de Liébana</span>
         </div>
         <a class="cabin-cta" href="chalet-el-urogallo.html">Ver Chalet El Urogallo</a>
+        <a class="cabin-reservar" href="#reserva-online" data-chalet="urogallo">Reservar este chalet</a>
       </div>
     </div>
 
@@ -573,6 +687,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <span class="cabin-feat">🌿 Valle de Liébana</span>
         </div>
         <a class="cabin-cta" href="chalet-el-armino.html">Ver Chalet El Armiño</a>
+        <a class="cabin-reservar" href="#reserva-online" data-chalet="armino">Reservar este chalet</a>
       </div>
     </div>
 
@@ -584,6 +699,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <h2>Reserva Online</h2>
   <div class="reserva-box">
 
+    <!-- ===== PASO 1: chalet, fechas y precio ===== -->
     <label for="cabaña">Selecciona chalet</label>
     <select id="cabaña">
       <option value="rebeco">Chalet El Rebeco</option>
@@ -620,16 +736,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <div id="mensajeUrgencia" class="mensaje-urgencia"></div>
 
-    <label for="nombre">Nombre completo</label>
-    <input type="text" id="nombre" placeholder="Nombre">
+    <div class="aviso-50">
+      💶 <strong>Reserva desde solo 50 €</strong><br>
+      Resto a pagar en destino
+    </div>
 
-    <label for="telefono">Teléfono</label>
-    <input type="tel" id="telefono" placeholder="Teléfono">
-
-    <label for="email">Email</label>
-    <input type="email" id="email" placeholder="Email">
-
-    <button id="btnCalcular">Calcular precio</button>
+    <button id="btnCalcular" type="button">Calcular precio</button>
     <div class="spinner" id="spinner"></div>
 
     <div id="resultado" class="resumen-reserva" style="display:none;">
@@ -638,8 +750,25 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <p><strong>Total estancia:</strong> <span id="total"></span> €</p>
       <p><strong>Descuento aplicado:</strong> <span id="descuento" class="descuento">0</span> €</p>
       <p><strong>Reserva ahora:</strong> 50 €</p>
-      <p><strong>Resto a pagar en alojamiento:</strong> <span id="resto"></span> €</p>
-      <button id="btnPagar">Pagar</button>
+      <p><strong>Resto a pagar en destino:</strong> <span id="resto"></span> €</p>
+
+      <button id="btnContinuar" type="button">Continuar con la reserva</button>
+
+      <!-- ===== PASO 2: datos del cliente y pago ===== -->
+      <div id="pasoDatos">
+        <h3>Tus datos</h3>
+
+        <label for="nombre">Nombre completo</label>
+        <input type="text" id="nombre" placeholder="Nombre">
+
+        <label for="telefono">Teléfono</label>
+        <input type="tel" id="telefono" placeholder="Teléfono">
+
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="Email">
+
+        <button id="btnPagar" type="button">Pagar 50 € y reservar</button>
+      </div>
     </div>
 
   </div>
@@ -716,7 +845,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <footer>
   <p><a href="aviso-legal.html">Aviso Legal</a> | <a href="privacidad.html">Política de Privacidad</a> | <a href="cookies.html">Política de Cookies</a></p>
-  <p>© casasenpicosdeeuropa.es · Valle de Liébana · Picos de Europa</p>
+  <p id="secretoAdmin">© casasenpicosdeeuropa.es · Valle de Liébana · Picos de Europa</p>
 </footer>
 
 <a href="https://wa.me/34620419157" target="_blank" id="whatsappButton" title="Chatea con nosotros">
@@ -729,6 +858,85 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
 <script src="js/main.js"></script>
 <script src="js/index-carousel.js"></script>
+
+<!-- ===== RESERVA EN DOS PASOS: mostrar los datos solo al continuar ===== -->
+<script>
+(function () {
+  var btnCalcular  = document.getElementById('btnCalcular');
+  var btnContinuar = document.getElementById('btnContinuar');
+  var pasoDatos    = document.getElementById('pasoDatos');
+  if (!btnCalcular || !btnContinuar || !pasoDatos) return;
+
+  // Paso 2: aparecen nombre, teléfono y email
+  btnContinuar.addEventListener('click', function () {
+    pasoDatos.style.display = 'block';
+    btnContinuar.style.display = 'none';
+    pasoDatos.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // Si recalculan el precio (otras fechas u otro chalet), vuelven al paso 1
+  btnCalcular.addEventListener('click', function () {
+    pasoDatos.style.display = 'none';
+    btnContinuar.style.display = 'block';
+
+    // Al terminar el cálculo, bajar hasta el resumen del precio
+    setTimeout(function () {
+      var resultado = document.getElementById('resultado');
+      if (resultado && resultado.style.display === 'block') {
+        resultado.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 500);
+  });
+
+  // Al cambiar de chalet se oculta el precio anterior
+  var selector = document.getElementById('cabaña');
+  selector.addEventListener('change', function () {
+    document.getElementById('resultado').style.display = 'none';
+    pasoDatos.style.display = 'none';
+    btnContinuar.style.display = 'block';
+  });
+
+  // Botones "Reservar este chalet" de las tarjetas
+  document.querySelectorAll('[data-chalet]').forEach(function (enlace) {
+    enlace.addEventListener('click', function () {
+      selector.value = enlace.getAttribute('data-chalet');
+      selector.dispatchEvent(new Event('change'));
+    });
+  });
+})();
+
+// ===== CANDADO DE ADMINISTRADOR: oculto para los visitantes =====
+// Se muestra solo en tu dispositivo: automáticamente si ya has entrado como
+// administrador antes, o pulsando 5 veces seguidas el texto © del pie de página.
+(function () {
+  var boton = document.getElementById('adminButton');
+  if (!boton) return;
+
+  // Visible si ya lo activaste antes en este dispositivo
+  // o si ya hay una clave de administrador guardada.
+  try {
+    if (localStorage.getItem('chalets_admin_visible') ||
+        localStorage.getItem('chalets_admin_key')) {
+      boton.classList.add('visible');
+    }
+  } catch (e) {}
+
+  var texto = document.getElementById('secretoAdmin');
+  var toques = 0, temporizador;
+  if (texto) {
+    texto.addEventListener('click', function () {
+      toques++;
+      clearTimeout(temporizador);
+      temporizador = setTimeout(function () { toques = 0; }, 2000);
+      if (toques >= 5) {
+        boton.classList.add('visible');
+        try { localStorage.setItem('chalets_admin_visible', '1'); } catch (e) {}
+        toques = 0;
+      }
+    });
+  }
+})();
+</script>
 
 </body>
 </html>
