@@ -599,6 +599,53 @@ html { scroll-behavior: smooth; }
   text-decoration: underline;
 }
 
+/* ===== PREGUNTAS FRECUENTES ===== */
+.faq-lista { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+
+.faq-item {
+  background: #fff;
+  border: 1.5px solid #e8e1d4;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.faq-item[open] { border-color: #2e5a6b; }
+
+.faq-item summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 14px 16px;
+  font-weight: 600;
+  font-size: 15px;
+  color: #1a2f3d;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.faq-item summary::-webkit-details-marker { display: none; }
+
+.faq-item summary::after {
+  content: '+';
+  font-size: 22px;
+  line-height: 1;
+  color: #2e5a6b;
+  flex-shrink: 0;
+}
+
+.faq-item[open] summary::after { content: '−'; }
+
+.faq-item p {
+  margin: 0;
+  padding: 0 16px 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #555;
+}
+
+.faq-item p a { color: #2e5a6b; text-decoration: underline; }
+
 /* ===== CANDADO ADMIN: oculto salvo en tu dispositivo ===== */
 #adminButton.visible { display: flex; }
 
@@ -834,6 +881,54 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <button id="btnPagar" type="button">Pagar 50 € y reservar</button>
       </div>
     </div>
+
+  </div>
+</section>
+
+<!-- ===== PREGUNTAS FRECUENTES ===== -->
+<section id="faq">
+  <h2>Preguntas frecuentes</h2>
+  <div class="faq-lista">
+
+    <details class="faq-item" name="faq">
+      <summary>¿Se admiten mascotas?</summary>
+      <p>Se admite un máximo de una mascota por chalet, bajo la exclusiva responsabilidad de su dueño. Puede tener coste adicional; consúltanos antes de reservar.</p>
+    </details>
+
+    <details class="faq-item" name="faq">
+      <summary>¿Incluye ropa de cama y toallas?</summary>
+      <p>Sí, hay ropa de cama y toallas.</p>
+    </details>
+
+    <details class="faq-item" name="faq">
+      <summary>¿Hay wifi?</summary>
+      <p>Sí, hay wifi.</p>
+    </details>
+
+    <details class="faq-item" name="faq">
+      <summary>¿Hay pellets para la estufa?</summary>
+      <p>Sí, la estufa funciona con pellets. Está incluido 1 saco de 15 kg. Si necesitas más, consúltanos; puede tener coste adicional.</p>
+    </details>
+
+    <details class="faq-item" name="faq">
+      <summary>¿Hay aparcamiento?</summary>
+      <p>Sí, hay parking subterráneo.</p>
+    </details>
+
+    <details class="faq-item" name="faq">
+      <summary>¿Se puede fumar?</summary>
+      <p>Está prohibido fumar.</p>
+    </details>
+
+    <details class="faq-item" name="faq">
+      <summary>¿Cómo se paga el resto de la estancia?</summary>
+      <p>El resto se paga en destino, en efectivo o por Bizum.</p>
+    </details>
+
+    <details class="faq-item" name="faq">
+      <summary>¿Cómo llegar?</summary>
+      <p>Busca «Bores, Vega de Liébana» en Google Maps. <a href="https://www.google.com/maps/search/?api=1&query=Bores%2C%20Vega%20de%20Li%C3%A9bana" target="_blank" rel="noopener">Abrir en Google Maps</a></p>
+    </details>
 
   </div>
 </section>
