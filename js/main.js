@@ -120,22 +120,29 @@ function pintarRangoVisual() {
   });
 }
 
-function validarRango(inicio, fin) {
+// Devuelve el motivo por el que el rango no es válido, o null si está libre
+function motivoRangoNoValido(inicio, fin) {
   const isoInicio = fechaLocal(inicio);
   const isoFin = fechaLocal(fin);
   if (esBloqueada(isoInicio) && esPrimerDiaBloque(isoInicio)) {
-    alert("No puedes iniciar la reserva en ese día."); return false;
+    return "No puedes iniciar la reserva en ese día.";
   }
   let check = new Date(inicio); check.setDate(check.getDate() + 1);
   while (check < fin) {
     if (esBloqueada(fechaLocal(check))) {
-      alert("No puedes seleccionar un rango que incluye fechas ya reservadas."); return false;
+      return "No puedes seleccionar un rango que incluye fechas ya reservadas.";
     }
     check.setDate(check.getDate() + 1);
   }
   if (esBloqueada(isoFin) && !esPrimerDiaBloque(isoFin)) {
-    alert("No puedes terminar la reserva en ese día."); return false;
+    return "No puedes terminar la reserva en ese día.";
   }
+  return null;
+}
+
+function validarRango(inicio, fin) {
+  const motivo = motivoRangoNoValido(inicio, fin);
+  if (motivo) { alert(motivo); return false; }
   return true;
 }
 
@@ -318,10 +325,12 @@ function calcularReserva() {
 }
 
 // PASO 2: aquí se validan los datos personales antes de pagar
-function reservar() {
+async function reservar() {
   const campoNombre = document.getElementById("nombre");
   const campoTelefono = document.getElementById("telefono");
   const campoEmail = document.getElementById("email");
+  const campoPrivacidad = document.getElementById("aceptoPrivacidad");
+  const btnPagar = document.getElementById("btnPagar");
 
   if (!campoNombre.value.trim()) {
     alert("Introduce tu nombre completo.");
@@ -335,8 +344,35 @@ function reservar() {
     alert("Introduce un email válido.");
     campoEmail.focus(); return;
   }
+  if (campoPrivacidad && !campoPrivacidad.checked) {
+    alert("Para continuar debes aceptar la política de privacidad.");
+    return;
+  }
 
-  alert("Aquí se conectará el pago de 50 €.");
+  // Volver a comprobar la disponibilidad justo antes de cobrar,
+  // por si alguien ha reservado esas fechas mientras tanto
+  const textoBoton = btnPagar.textContent;
+  btnPagar.disabled = true;
+  btnPagar.textContent = "Comprobando disponibilidad...";
+
+  try {
+    const chalet = document.getElementById("cabaña").value;
+    const reservas = await cargarReservasBackend();
+    fechasOcupadasFlatpickr = reservas[chalet] || [];
+    bloqueosFlatpickr = reservas[`bloqueos_${chalet}`] || [];
+
+    if (!rangoInicio || !rangoFin || motivoRangoNoValido(rangoInicio, rangoFin)) {
+      alert("Lo sentimos, esas fechas ya no están disponibles. Por favor, elige otras.");
+      document.getElementById("resultado").style.display = "none";
+      await prepararFlatpickr();
+      return;
+    }
+
+    alert("Aquí se conectará el pago de 50 €.");
+  } finally {
+    btnPagar.disabled = false;
+    btnPagar.textContent = textoBoton;
+  }
 }
 
 function actualizarUrgencia(fechasOcupadas) {
