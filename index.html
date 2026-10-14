@@ -484,7 +484,29 @@ html { scroll-behavior: smooth; }
   line-height: 1.4;
 }
 
-.aviso-50 strong { font-size: 17px; }
+/* Una sola línea: el tamaño se adapta al ancho de la pantalla */
+.aviso-50 { white-space: nowrap; }
+.aviso-50 strong { font-size: clamp(12px, 3.9vw, 18px); }
+
+/* ===== MES Y AÑO DEL CALENDARIO: bien visibles sobre el fondo oscuro ===== */
+.flatpickr-months .flatpickr-month,
+.flatpickr-current-month,
+.flatpickr-current-month span.cur-month,
+.flatpickr-current-month input.cur-year,
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+  color: #fff !important;
+  fill: #fff !important;
+  font-weight: 700 !important;
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+  font-size: 1.15rem !important;
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months .flatpickr-monthDropdown-month {
+  background-color: #1a2f3d !important;
+  color: #fff !important;
+}
 
 .reserva-box #btnCalcular {
   margin-top: 12px;
@@ -539,6 +561,43 @@ html { scroll-behavior: smooth; }
 }
 
 .cabin-reservar:hover { background: #e65100; }
+
+/* ===== CONDICIONES Y CASILLA DE PRIVACIDAD (paso 2) ===== */
+.condiciones-reserva {
+  margin-top: 14px;
+  padding: 10px 12px;
+  background: #f3f6f7;
+  border-radius: 8px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #444;
+}
+
+.condiciones-reserva p + p { margin-top: 6px; }
+
+.check-privacidad {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 14px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: #333;
+}
+
+.reserva-box .check-privacidad input {
+  width: 20px;
+  height: 20px;
+  margin: 2px 0 0;
+  padding: 0;
+  flex-shrink: 0;
+  accent-color: #2e5a6b;
+}
+
+.check-privacidad a {
+  color: #2e5a6b;
+  text-decoration: underline;
+}
 
 /* ===== CANDADO ADMIN: oculto salvo en tu dispositivo ===== */
 #adminButton.visible { display: flex; }
@@ -766,6 +825,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         <label for="email">Email</label>
         <input type="email" id="email" placeholder="Email">
+
+        <div class="condiciones-reserva">
+          <p>✅ Con los <strong>50 €</strong> confirmas tu reserva. El resto se paga en destino.</p>
+          <p>🔄 Cancelación gratis hasta 15 días antes de la llegada.</p>
+          <p>🕒 Entrada desde las 15:00 · Salida antes de las 11:00</p>
+        </div>
+
+        <label class="check-privacidad" for="aceptoPrivacidad">
+          <input type="checkbox" id="aceptoPrivacidad">
+          <span>He leído y acepto la <a href="privacidad.html" target="_blank" rel="noopener">política de privacidad</a> y el <a href="aviso-legal.html" target="_blank" rel="noopener">aviso legal</a>.</span>
+        </label>
 
         <button id="btnPagar" type="button">Pagar 50 € y reservar</button>
       </div>
