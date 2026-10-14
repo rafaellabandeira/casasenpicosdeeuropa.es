@@ -600,7 +600,13 @@ html { scroll-behavior: smooth; }
 }
 
 /* ===== PREGUNTAS FRECUENTES ===== */
-.faq-lista { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+.faq-lista { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+
+/* Menos espacio entre el motor de reservas, las preguntas y el contacto */
+#reserva-online { padding-bottom: 10px; }
+#reserva-online .reserva-box { margin-bottom: 10px; }
+#faq { padding-top: 10px; padding-bottom: 10px; }
+#contacto { padding-top: 10px; }
 
 .faq-item {
   background: #fff;
@@ -614,9 +620,9 @@ html { scroll-behavior: smooth; }
 .faq-item summary {
   cursor: pointer;
   list-style: none;
-  padding: 14px 16px;
+  padding: 10px 14px;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 14.5px;
   color: #1a2f3d;
   display: flex;
   justify-content: space-between;
@@ -638,7 +644,7 @@ html { scroll-behavior: smooth; }
 
 .faq-item p {
   margin: 0;
-  padding: 0 16px 16px;
+  padding: 0 14px 12px;
   font-size: 14px;
   line-height: 1.6;
   color: #555;
