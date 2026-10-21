@@ -345,16 +345,6 @@ function calcularReserva() {
   }
   const inicio = rangoInicio, fin = rangoFin;
   const noches = Math.round((fin - inicio) / (1000*60*60*24));
-  const nombre = document.getElementById("nombre").value.trim();
-  const telefono = document.getElementById("telefono").value.trim();
-  const email = document.getElementById("email").value.trim();
-
-  if (!nombre || !telefono || !email) {
-    if (!/\S+@\S+\.\S+/.test(email)) alert("Introduce un email válido.");
-    else alert("Completa todos los datos personales");
-    return;
-  }
-
   const spinner = document.getElementById("spinner");
   const resultado = document.getElementById("resultado");
   spinner.style.display = "block";
@@ -395,7 +385,41 @@ function calcularReserva() {
   }, 300);
 }
 
-function reservar() { alert("Aquí se conectará el pago de 50 €."); }
+// Paso 2: los datos personales se piden aquí, al pulsar "Pagar"
+function reservar() {
+  const nombre = document.getElementById("nombre")?.value.trim();
+  const telefono = document.getElementById("telefono")?.value.trim();
+  const email = document.getElementById("email")?.value.trim();
+
+  if (!nombre || !telefono) {
+    alert("Completa tu nombre y teléfono para confirmar la reserva."); return;
+  }
+  if (!/\S+@\S+\.\S+/.test(email || "")) {
+    alert("Introduce un email válido."); return;
+  }
+  alert("Aquí se conectará el pago de 50 €.");
+}
+
+// Mueve nombre, teléfono y email al bloque del segundo paso (encima del botón Pagar)
+function prepararDatosCliente() {
+  const resultado = document.getElementById("resultado");
+  const btnPagar = document.getElementById("btnPagar");
+  if (!resultado || !btnPagar) return;
+  const contenedor = document.createElement("div");
+  contenedor.id = "datosCliente";
+  contenedor.style.marginTop = "12px";
+  const titulo = document.createElement("p");
+  titulo.innerHTML = "<strong>Tus datos para confirmar la reserva</strong>";
+  contenedor.appendChild(titulo);
+  ["nombre", "telefono", "email"].forEach(id => {
+    const input = document.getElementById(id);
+    if (!input) return;
+    const label = document.querySelector(`label[for="${id}"]`);
+    if (label) contenedor.appendChild(label);
+    contenedor.appendChild(input);
+  });
+  resultado.insertBefore(contenedor, btnPagar);
+}
 
 function actualizarUrgencia(fechasOcupadas) {
   const mensaje = document.getElementById("mensajeUrgencia");
@@ -439,6 +463,7 @@ function initHamburger() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  prepararDatosCliente();
   initHamburger();
   initCarousel(".carousel-container",".carousel-slide",".prev",".next",".indicator");
   initCarousel(".carousel-container-general",".carousel-slide-general",".prev-general",".next-general",".indicator-general");
