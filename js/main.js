@@ -120,29 +120,22 @@ function pintarRangoVisual() {
   });
 }
 
-// Devuelve el motivo por el que el rango no es válido, o null si está libre
-function motivoRangoNoValido(inicio, fin) {
+function validarRango(inicio, fin) {
   const isoInicio = fechaLocal(inicio);
   const isoFin = fechaLocal(fin);
   if (esBloqueada(isoInicio) && esPrimerDiaBloque(isoInicio)) {
-    return "No puedes iniciar la reserva en ese día.";
+    alert("No puedes iniciar la reserva en ese día."); return false;
   }
   let check = new Date(inicio); check.setDate(check.getDate() + 1);
   while (check < fin) {
     if (esBloqueada(fechaLocal(check))) {
-      return "No puedes seleccionar un rango que incluye fechas ya reservadas.";
+      alert("No puedes seleccionar un rango que incluye fechas ya reservadas."); return false;
     }
     check.setDate(check.getDate() + 1);
   }
   if (esBloqueada(isoFin) && !esPrimerDiaBloque(isoFin)) {
-    return "No puedes terminar la reserva en ese día.";
+    alert("No puedes terminar la reserva en ese día."); return false;
   }
-  return null;
-}
-
-function validarRango(inicio, fin) {
-  const motivo = motivoRangoNoValido(inicio, fin);
-  if (motivo) { alert(motivo); return false; }
   return true;
 }
 
@@ -258,27 +251,90 @@ async function guardarBloqueoEnBackend() {
   await guardarDatosBackend(datosCompletos);
 }
 
+// ---------- FESTIVOS ----------
+// Se tratan como fin de semana: precio de fin de semana, tanto la noche del festivo
+// como la víspera. Fechas fijas en formato "MM-DD".
+const FESTIVOS_FIJOS = ["01-01","01-06","05-01","08-15","10-12","11-01","12-06","12-07","12-08","12-25"];
+
+// Festivos trasladados a lunes (u otros puntuales) de un año concreto, formato "AAAA-MM-DD".
+// REVISAR CADA OTOÑO con el calendario laboral oficial y añadir los del año siguiente.
+const FESTIVOS_EXTRA = [];
+
+function pascua(anio) {
+  const a = anio % 19, b = Math.floor(anio/100), c = anio % 100;
+  const d = Math.floor(b/4), e = b % 4, f = Math.floor((b+8)/25);
+  const g = Math.floor((b-f+1)/3);
+  const h = (19*a + b - d - g + 15) % 30;
+  const i = Math.floor(c/4), k = c % 4;
+  const l = (32 + 2*e + 2*i - h - k) % 7;
+  const m = Math.floor((a + 11*h + 22*l)/451);
+  const mes = Math.floor((h + l - 7*m + 114)/31);
+  const dia = ((h + l - 7*m + 114) % 31) + 1;
+  return new Date(anio, mes-1, dia);
+}
+
+function esFestivoNacional(fecha) {
+  const mm = String(fecha.getMonth()+1).padStart(2,"0");
+  const dd = String(fecha.getDate()).padStart(2,"0");
+  if (FESTIVOS_FIJOS.includes(`${mm}-${dd}`)) return true;
+  if (FESTIVOS_EXTRA.includes(fechaLocal(fecha))) return true;
+  const p = pascua(fecha.getFullYear());
+  for (const dias of [-3, -2]) {            // Jueves Santo y Viernes Santo
+    const f = new Date(p);
+    f.setDate(f.getDate() + dias);
+    if (f.getDate() === fecha.getDate() && f.getMonth() === fecha.getMonth()) return true;
+  }
+  return false;
+}
+
+// Noche de festivo o víspera de festivo
+function esNocheFestiva(dia) {
+  const siguiente = new Date(dia);
+  siguiente.setDate(siguiente.getDate() + 1);
+  return esFestivoNacional(dia) || esFestivoNacional(siguiente);
+}
+
+// Semana Santa: del Domingo de Ramos al Domingo de Resurrección (ambos incluidos).
+function esSemanaSanta(fecha) {
+  const p = pascua(fecha.getFullYear());
+  const inicio = new Date(p); inicio.setDate(inicio.getDate() - 7);
+  const f = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
+  return f >= inicio && f <= p;
+}
+
+// ¿Alguna noche de la estancia cae en Semana Santa?
+function estanciaEnSemanaSanta(inicio, noches) {
+  for (let i = 0; i < noches; i++) {
+    const dia = new Date(inicio); dia.setDate(dia.getDate() + i);
+    if (esSemanaSanta(dia)) return true;
+  }
+  return false;
+}
+
+// Noche con precio de fin de semana: viernes, sábado, festivo o víspera de festivo
+function esNocheFinde(dia) {
+  const dow = dia.getDay();
+  return dow === 5 || dow === 6 || esNocheFestiva(dia);
+}
+
 // ---------- TEMPORADAS Y MÍNIMO DE NOCHES ----------
+// Temporada alta: julio, agosto y Navidad (22/12 - 7/01). El fin de semana y los festivos
+// tienen precio propio pero NO cuentan como temporada alta (ni para mínimo ni para descuentos).
 function esTemporadaAlta(fecha) {
-  const mes = fecha.getMonth()+1, dia = fecha.getDate(), dow = fecha.getDay();
-  return (mes===7||mes===8||(mes===12&&dia>=22)||(mes===1&&dia<=7)||dow===5||dow===6);
+  const mes = fecha.getMonth()+1, dia = fecha.getDate();
+  return (mes===7||mes===8||(mes===12&&dia>=22)||(mes===1&&dia<=7));
 }
 
 // Mínimo de noches según la fecha de entrada:
-// - Julio, agosto y Navidad (22/12 - 7/01): 4 noches
-// - Entrada en viernes (viernes + sábado), fuera de esas fechas: 2 noches
-// - Entrada en sábado: 4 noches
-// - Resto: 2 noches
+// - Temporada alta: 4 noches
+// - Semana Santa: 3 noches
+// - Resto (incluye viernes, sábado y festivos): 2 noches
 function minimoNoches(inicio) {
-  const mes = inicio.getMonth() + 1, dia = inicio.getDate();
-  const verano = (mes === 7 || mes === 8);
-  const navidad = (mes === 12 && dia >= 22) || (mes === 1 && dia <= 7);
-  if (verano || navidad) return 4;
-  if (inicio.getDay() === 5) return 2;
-  return esTemporadaAlta(inicio) ? 4 : 2;
+  if (esTemporadaAlta(inicio)) return 4;
+  if (esSemanaSanta(inicio)) return 3;
+  return 2;
 }
 
-// PASO 1: calcula el precio (ya NO pide nombre, teléfono ni email)
 function calcularReserva() {
   const chalet = document.getElementById("cabaña").value;
   if (!rangoInicio || !rangoFin) {
@@ -286,6 +342,15 @@ function calcularReserva() {
   }
   const inicio = rangoInicio, fin = rangoFin;
   const noches = Math.round((fin - inicio) / (1000*60*60*24));
+  const nombre = document.getElementById("nombre").value.trim();
+  const telefono = document.getElementById("telefono").value.trim();
+  const email = document.getElementById("email").value.trim();
+
+  if (!nombre || !telefono || !email) {
+    if (!/\S+@\S+\.\S+/.test(email)) alert("Introduce un email válido.");
+    else alert("Completa todos los datos personales");
+    return;
+  }
 
   const spinner = document.getElementById("spinner");
   const resultado = document.getElementById("resultado");
@@ -306,12 +371,15 @@ function calcularReserva() {
     let total = 0;
     for (let i = 0; i < noches; i++) {
       const dia = new Date(inicio); dia.setDate(dia.getDate() + i);
-      total += esTemporadaAlta(dia) ? 130 : 85;
+      total += (esTemporadaAlta(dia) || esNocheFinde(dia)) ? 130 : 85;
     }
 
+    // Sin descuento si alguna noche cae en Semana Santa
     let descuento = 0;
-    if (noches>=6 && esTemporadaAlta(inicio)) descuento = total*0.10;
-    else if (noches>=3 && !esTemporadaAlta(inicio)) descuento = total*0.10;
+    if (!estanciaEnSemanaSanta(inicio, noches)) {
+      if (noches>=6 && esTemporadaAlta(inicio)) descuento = total*0.10;
+      else if (noches>=3 && !esTemporadaAlta(inicio)) descuento = total*0.10;
+    }
     total -= descuento;
 
     const nombres = { rebeco:"Chalet El Rebeco", urogallo:"Chalet El Urogallo", armino:"Chalet El Armiño" };
@@ -324,56 +392,7 @@ function calcularReserva() {
   }, 300);
 }
 
-// PASO 2: aquí se validan los datos personales antes de pagar
-async function reservar() {
-  const campoNombre = document.getElementById("nombre");
-  const campoTelefono = document.getElementById("telefono");
-  const campoEmail = document.getElementById("email");
-  const campoPrivacidad = document.getElementById("aceptoPrivacidad");
-  const btnPagar = document.getElementById("btnPagar");
-
-  if (!campoNombre.value.trim()) {
-    alert("Introduce tu nombre completo.");
-    campoNombre.focus(); return;
-  }
-  if (!campoTelefono.value.trim()) {
-    alert("Introduce tu teléfono.");
-    campoTelefono.focus(); return;
-  }
-  if (!/\S+@\S+\.\S+/.test(campoEmail.value.trim())) {
-    alert("Introduce un email válido.");
-    campoEmail.focus(); return;
-  }
-  if (campoPrivacidad && !campoPrivacidad.checked) {
-    alert("Para continuar debes aceptar la política de privacidad.");
-    return;
-  }
-
-  // Volver a comprobar la disponibilidad justo antes de cobrar,
-  // por si alguien ha reservado esas fechas mientras tanto
-  const textoBoton = btnPagar.textContent;
-  btnPagar.disabled = true;
-  btnPagar.textContent = "Comprobando disponibilidad...";
-
-  try {
-    const chalet = document.getElementById("cabaña").value;
-    const reservas = await cargarReservasBackend();
-    fechasOcupadasFlatpickr = reservas[chalet] || [];
-    bloqueosFlatpickr = reservas[`bloqueos_${chalet}`] || [];
-
-    if (!rangoInicio || !rangoFin || motivoRangoNoValido(rangoInicio, rangoFin)) {
-      alert("Lo sentimos, esas fechas ya no están disponibles. Por favor, elige otras.");
-      document.getElementById("resultado").style.display = "none";
-      await prepararFlatpickr();
-      return;
-    }
-
-    alert("Aquí se conectará el pago de 50 €.");
-  } finally {
-    btnPagar.disabled = false;
-    btnPagar.textContent = textoBoton;
-  }
-}
+function reservar() { alert("Aquí se conectará el pago de 50 €."); }
 
 function actualizarUrgencia(fechasOcupadas) {
   const mensaje = document.getElementById("mensajeUrgencia");
