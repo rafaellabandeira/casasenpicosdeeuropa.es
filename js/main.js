@@ -253,12 +253,8 @@ async function guardarBloqueoEnBackend() {
 
 // ---------- FESTIVOS ----------
 // Se tratan como fin de semana: precio de fin de semana, tanto la noche del festivo
-// como la víspera. Fechas fijas en formato "MM-DD".
+// como la víspera. Fechas fijas en formato "MM-DD". Si caen en domingo, el lunes también cuenta.
 const FESTIVOS_FIJOS = ["01-01","01-06","05-01","08-15","10-12","11-01","12-06","12-07","12-08","12-25"];
-
-// Festivos trasladados a lunes (u otros puntuales) de un año concreto, formato "AAAA-MM-DD".
-// REVISAR CADA OTOÑO con el calendario laboral oficial y añadir los del año siguiente.
-const FESTIVOS_EXTRA = [];
 
 function pascua(anio) {
   const a = anio % 19, b = Math.floor(anio/100), c = anio % 100;
@@ -277,7 +273,14 @@ function esFestivoNacional(fecha) {
   const mm = String(fecha.getMonth()+1).padStart(2,"0");
   const dd = String(fecha.getDate()).padStart(2,"0");
   if (FESTIVOS_FIJOS.includes(`${mm}-${dd}`)) return true;
-  if (FESTIVOS_EXTRA.includes(fechaLocal(fecha))) return true;
+  // Si un festivo fijo cae en domingo, el lunes siguiente también cuenta como festivo
+  const ayer = new Date(fecha);
+  ayer.setDate(ayer.getDate() - 1);
+  if (ayer.getDay() === 0) {
+    const am = String(ayer.getMonth()+1).padStart(2,"0");
+    const ad = String(ayer.getDate()).padStart(2,"0");
+    if (FESTIVOS_FIJOS.includes(`${am}-${ad}`)) return true;
+  }
   const p = pascua(fecha.getFullYear());
   for (const dias of [-3, -2]) {            // Jueves Santo y Viernes Santo
     const f = new Date(p);
