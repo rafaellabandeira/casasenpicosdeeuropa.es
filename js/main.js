@@ -400,25 +400,36 @@ function reservar() {
   alert("Aquí se conectará el pago de 50 €.");
 }
 
-// Mueve nombre, teléfono y email al bloque del segundo paso (encima del botón Pagar)
+// Mueve nombre, teléfono y email al bloque del segundo paso (dentro del resumen, antes de Pagar).
+// Está protegido: si algo falla, no se mueve nada y el resto de la página sigue funcionando.
 function prepararDatosCliente() {
-  const resultado = document.getElementById("resultado");
-  const btnPagar = document.getElementById("btnPagar");
-  if (!resultado || !btnPagar) return;
-  const contenedor = document.createElement("div");
-  contenedor.id = "datosCliente";
-  contenedor.style.marginTop = "12px";
-  const titulo = document.createElement("p");
-  titulo.innerHTML = "<strong>Tus datos para confirmar la reserva</strong>";
-  contenedor.appendChild(titulo);
-  ["nombre", "telefono", "email"].forEach(id => {
-    const input = document.getElementById(id);
-    if (!input) return;
-    const label = document.querySelector(`label[for="${id}"]`);
-    if (label) contenedor.appendChild(label);
-    contenedor.appendChild(input);
-  });
-  resultado.insertBefore(contenedor, btnPagar);
+  try {
+    const resultado = document.getElementById("resultado");
+    const btnPagar = document.getElementById("btnPagar");
+    if (!resultado || !btnPagar) return;
+
+    const contenedor = document.createElement("div");
+    contenedor.id = "datosCliente";
+    contenedor.style.marginTop = "12px";
+    const titulo = document.createElement("p");
+    titulo.innerHTML = "<strong>Tus datos para confirmar la reserva</strong>";
+    contenedor.appendChild(titulo);
+
+    // 1) Primero colocar el contenedor (si falla, los campos siguen en su sitio original)
+    if (btnPagar.parentNode === resultado) resultado.insertBefore(contenedor, btnPagar);
+    else resultado.appendChild(contenedor);
+
+    // 2) Después mover los campos
+    ["nombre", "telefono", "email"].forEach(id => {
+      const input = document.getElementById(id);
+      if (!input) return;
+      const label = document.querySelector(`label[for="${id}"]`);
+      if (label) contenedor.appendChild(label);
+      contenedor.appendChild(input);
+    });
+  } catch (err) {
+    console.error("prepararDatosCliente:", err);
+  }
 }
 
 function actualizarUrgencia(fechasOcupadas) {
