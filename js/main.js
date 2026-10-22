@@ -349,6 +349,7 @@ function calcularReserva() {
   const resultado = document.getElementById("resultado");
   spinner.style.display = "block";
   resultado.style.display = "none";
+  reiniciarDatosCliente();
 
   setTimeout(() => {
     const opc = { day: "numeric", month: "short" };
@@ -385,8 +386,21 @@ function calcularReserva() {
   }, 300);
 }
 
-// Paso 2: los datos personales se piden aquí, al pulsar "Pagar"
+// Paso 2: al pulsar "Continuar con la reserva" aparecen los datos personales;
+// al pulsarlo otra vez se validan y se continúa con el pago.
 function reservar() {
+  const contenedor = document.getElementById("datosCliente");
+  const btn = document.getElementById("btnPagar");
+
+  // Primer toque: mostrar los datos
+  if (contenedor && contenedor.style.display === "none") {
+    contenedor.style.display = "block";
+    if (btn) btn.textContent = "Confirmar y pagar 50 €";
+    contenedor.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+
+  // Segundo toque: validar
   const nombre = document.getElementById("nombre")?.value.trim();
   const telefono = document.getElementById("telefono")?.value.trim();
   const email = document.getElementById("email")?.value.trim();
@@ -400,24 +414,31 @@ function reservar() {
   alert("Aquí se conectará el pago de 50 €.");
 }
 
-// Mueve nombre, teléfono y email al bloque del segundo paso (dentro del resumen, antes de Pagar).
+// Oculta de nuevo los datos si se vuelve a calcular el precio
+function reiniciarDatosCliente() {
+  const contenedor = document.getElementById("datosCliente");
+  const btn = document.getElementById("btnPagar");
+  if (contenedor) contenedor.style.display = "none";
+  if (btn && btn.dataset.textoOriginal) btn.textContent = btn.dataset.textoOriginal;
+}
+
+// Prepara el bloque de datos (oculto) justo encima del botón de continuar.
 // Está protegido: si algo falla, no se mueve nada y el resto de la página sigue funcionando.
 function prepararDatosCliente() {
   try {
-    const resultado = document.getElementById("resultado");
     const btnPagar = document.getElementById("btnPagar");
-    if (!resultado || !btnPagar) return;
+    if (!btnPagar || !btnPagar.parentNode) return;
+    btnPagar.dataset.textoOriginal = btnPagar.textContent;
 
     const contenedor = document.createElement("div");
     contenedor.id = "datosCliente";
-    contenedor.style.marginTop = "12px";
+    contenedor.style.cssText = "display:none;margin-top:12px;";
     const titulo = document.createElement("p");
     titulo.innerHTML = "<strong>Tus datos para confirmar la reserva</strong>";
     contenedor.appendChild(titulo);
 
     // 1) Primero colocar el contenedor (si falla, los campos siguen en su sitio original)
-    if (btnPagar.parentNode === resultado) resultado.insertBefore(contenedor, btnPagar);
-    else resultado.appendChild(contenedor);
+    btnPagar.parentNode.insertBefore(contenedor, btnPagar);
 
     // 2) Después mover los campos
     ["nombre", "telefono", "email"].forEach(id => {
