@@ -24,6 +24,9 @@ function borrarClaveGuardada() {
 }
 const BIN_ID = "69eefe35aaba882197405520";
 const BACKEND_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+
+// Importe que se paga ahora para reservar (el resto se paga en destino)
+const ANTICIPO = 100;
 const READ_KEY = "$2a$10$yTI7T9DU2v5K1mOvm8EeLen5plPKiEZeVbXMPCOHXZldLXC1jxb.e";
 let adminKey = null;
 
@@ -380,7 +383,7 @@ function calcularReserva() {
     document.getElementById("cabañaSeleccionada").innerText = nombres[chalet] || chalet;
     document.getElementById("total").innerText = total.toFixed(2);
     document.getElementById("descuento").innerText = descuento.toFixed(2);
-    document.getElementById("resto").innerText = (total-50).toFixed(2);
+    document.getElementById("resto").innerText = (total-ANTICIPO).toFixed(2);
     spinner.style.display = "none";
     resultado.style.display = "block";
   }, 300);
@@ -395,7 +398,7 @@ function reservar() {
   // Primer toque: mostrar los datos
   if (contenedor && contenedor.style.display === "none") {
     contenedor.style.display = "block";
-    if (btn) btn.textContent = "Confirmar y pagar 50 €";
+    if (btn) btn.textContent = `Confirmar y pagar ${ANTICIPO} €`;
     contenedor.scrollIntoView({ behavior: "smooth", block: "center" });
     return;
   }
@@ -411,7 +414,33 @@ function reservar() {
   if (!/\S+@\S+\.\S+/.test(email || "")) {
     alert("Introduce un email válido."); return;
   }
-  alert("Aquí se conectará el pago de 50 €.");
+  const acepto = document.getElementById("aceptoPrivacidad");
+  if (acepto && !acepto.checked) {
+    alert("Debes aceptar la política de privacidad y el aviso legal."); return;
+  }
+  // Pago online todavía no activo
+  alert("El pago online todavía no está activo.\n\nPara reservar escríbenos por WhatsApp al 620 419 157 y te confirmamos la reserva.");
+}
+
+// Pone el importe del anticipo en los textos de la página (así solo hay que cambiar ANTICIPO)
+function aplicarAnticipoEnTextos() {
+  try {
+    const t = `${ANTICIPO} €`;
+    const aviso = document.querySelector(".aviso-50 strong");
+    if (aviso) aviso.textContent = `Reserva desde solo ${t}`;
+    document.querySelectorAll("#resultado p").forEach(p => {
+      const st = p.querySelector("strong");
+      if (st && st.textContent.trim().startsWith("Reserva ahora")) {
+        p.innerHTML = `<strong>Reserva ahora:</strong> ${t}`;
+      }
+    });
+    const cond = document.querySelector(".condiciones-reserva p strong");
+    if (cond && /50/.test(cond.textContent)) cond.textContent = t;
+    const btn = document.getElementById("btnPagar");
+    if (btn && /50/.test(btn.textContent)) btn.textContent = btn.textContent.replace("50", String(ANTICIPO));
+  } catch (err) {
+    console.error("aplicarAnticipoEnTextos:", err);
+  }
 }
 
 // Oculta de nuevo los datos si se vuelve a calcular el precio
@@ -426,6 +455,8 @@ function reiniciarDatosCliente() {
 // Está protegido: si algo falla, no se mueve nada y el resto de la página sigue funcionando.
 function prepararDatosCliente() {
   try {
+    // Si la página ya trae su propio flujo en dos pasos, no se toca nada
+    if (document.getElementById("pasoDatos") || document.getElementById("btnContinuar")) return;
     const btnPagar = document.getElementById("btnPagar");
     if (!btnPagar || !btnPagar.parentNode) return;
     btnPagar.dataset.textoOriginal = btnPagar.textContent;
@@ -495,6 +526,7 @@ function initHamburger() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  aplicarAnticipoEnTextos();
   prepararDatosCliente();
   initHamburger();
   initCarousel(".carousel-container",".carousel-slide",".prev",".next",".indicator");
